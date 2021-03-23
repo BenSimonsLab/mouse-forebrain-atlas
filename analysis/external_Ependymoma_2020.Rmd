@@ -1,0 +1,360 @@
+---
+title: "Ependymoma 2020"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+
+
+```{r setup, message=FALSE, warning=TRUE}
+library(ggplot2)
+library(viridis)
+library(patchwork)
+
+library(readr)
+library(dplyr)
+library(tibble)
+```
+
+
+
+```{r, message=FALSE, warning=TRUE}
+source("code/core_settings.R")
+source("code/core_functions.R")
+```
+
+
+```{r}
+metadata = read_csv("data/Ependymoma_2020/metadata_ependymoma_2020.csv") %>%
+              mutate(annot_leiden = seurat_clusters)
+
+annot_order = metadata %>% pull(annot_leiden) %>% unique()
+
+clusterIDs_tumour = c("18", "9", "12", "17", "23", "13", "20", "7", "0")
+annot_order = clusterIDs_tumour
+```
+
+
+# Pathways
+
+## Pathway KEGG
+
+```{r}
+tbl_AUC = read_csv("data/Ependymoma_2020/AUC_pathways_KEGG_ependymoma_2020.csv.gz")
+
+
+library(reshape2)
+
+tbl_AUC_long = tbl_AUC %>%
+                      melt(id.vars = c("cellID"),
+                          variable.name = "pathway",
+                          value.name= "AUC_score") %>%
+                      as_tibble()
+
+metadata_AUC = left_join(tbl_AUC_long, metadata %>% select(cellID, annot_leiden), by="cellID")
+metadata_AUC_KEGG = metadata_AUC
+```
+
+
+## Pathway panther
+
+```{r}
+tbl_AUC = read_csv("data/Ependymoma_2020/AUC_pathways_panther_ependymoma_2020.csv.gz")
+
+
+library(reshape2)
+
+tbl_AUC_long = tbl_AUC %>%
+                      melt(id.vars = c("cellID"),
+                          variable.name = "pathway",
+                          value.name= "AUC_score") %>%
+                      as_tibble()
+
+metadata_AUC = left_join(tbl_AUC_long, metadata %>% select(cellID, annot_leiden), by="cellID")
+
+metadata_AUC_panther = metadata_AUC
+```
+
+
+## Manual order
+
+```{r}
+metadata_AUC = bind_rows(metadata_AUC_KEGG, metadata_AUC_panther) %>%
+                  filter(!is.na(annot_leiden)) %>%
+                  filter(annot_leiden %in% clusterIDs_tumour)
+
+
+# pathways_selected = c("mmu04622_RIG-I-like_receptor_signaling_pathway",
+#                       "mmu04010_MAPK_signaling_pathway",
+#                       "mmu04340_Hedgehog_signaling_pathway",
+#                       "mmu04066_HIF-1_signaling_pathway",
+#                       "P04393_Ras_Pathway",
+#                       "P00026_Heterotrimeric_G-protein_signaling_pathway-Gi_alpha_and_Gs_alpha_mediated_pathway",
+#                       "mmu04390_Hippo_signaling_pathway",
+#                       "P05912_Dopamine_receptor_mediated_signaling_pathway",
+#                       "P00038_JAKSTAT_signaling_pathway",
+#                       "mmu04310_Wnt_signaling_pathway",
+#                       "mmu04020_Calcium_signaling_pathway",
+#                       "mmu04070_Phosphatidylinositol_signaling_system")
+
+pathways_selected = c("P00058_mRNA_splicing",
+                      "P05912_Dopamine_receptor_mediated_signaling_pathway",
+                      "P00013_Cell_cycle",
+                      "mmu04390_Hippo_signaling_pathway",
+                      "P00021_FGF_signaling_pathway",
+                      "P00018_EGF_receptor_signaling_pathway",
+                      "P00025_Hedgehog_signaling_pathway",
+                      "mmu04330_Notch_signaling_pathway",
+                      "mmu04068_FoxO_signaling_pathway",
+                      "P05731_GABA-B_receptor_II_signaling",
+                      "P00047_PDGF_signaling_pathway",
+                      "mmu04150_mTOR_signaling_pathway",
+                      "mmu04015_Rap1_signaling_pathway",
+                      "P00035_Interferon-gamma_signaling_pathway",
+                      "mmu04010_MAPK_signaling_pathway",
+                      "P00056_VEGF_signaling_pathway",
+                      "mmu04070_Phosphatidylinositol_signaling_system",
+                      "mmu04020_Calcium_signaling_pathway",
+                      "mmu04080_Neuroactive_ligand-receptor_interaction",
+                      "mmu04514_Cell_adhesion_molecules")
+
+tbl_pathway_labels = read_csv("data/AUC_pathways/pathway_labels.csv")
+
+tbl_pathway_labels_ordered = left_join(tibble(pathwayID = pathways_selected), tbl_pathway_labels, by="pathwayID")
+
+
+
+metadata_scaled_AUC = metadata_AUC %>%
+                  filter(pathway %in% pathways_selected) %>%
+                  group_by(pathway, annot_leiden) %>%
+                  summarise(mean_AUC_score = mean(AUC_score)) %>%
+                  group_by(pathway) %>%
+                  mutate(norm_0_1_mean_AUC_score = (mean_AUC_score - min(mean_AUC_score))/(max(mean_AUC_score) - min(mean_AUC_score))) %>%
+                  mutate(pathway = factor(pathway, levels=pathways_selected)) %>%
+                  mutate(annot_leiden = factor(annot_leiden, levels=annot_order)) %>%
+                  mutate(pathwayID = pathway) %>%
+                  left_join(tbl_pathway_labels, by="pathwayID") %>%
+                  mutate(pathway_label = factor(pathway_label, levels = tbl_pathway_labels_ordered$pathway_label))
+```
+
+
+```{r}
+# data_wide <- spread(olddata_long, condition, measurement)
+tbl_scores = metadata_scaled_AUC %>%
+            select(-c(mean_AUC_score, pathway_label, pathwayID)) %>%
+            tidyr::spread(pathway, norm_0_1_mean_AUC_score)
+
+cmat = as.matrix(tbl_scores %>% select(-annot_leiden))
+rownames(cmat) = tbl_scores %>% pull(annot_leiden)
+
+c <- cor(cmat, method="spearman")
+d <- as.dist(1-c)  # because correlation is a similarity measure and
+mat_cluster_cols <- hclust(d)
+
+c <- cor(t(cmat), method="spearman")
+d <- as.dist(1-c)  # because correlation is a similarity measure and
+mat_cluster_rows <- hclust(d)
+
+order_annot = rownames(cmat)[mat_cluster_rows$order]
+order_pathways = colnames(cmat)[mat_cluster_cols$order]
+order_pathways_labels = left_join(tibble(pathwayID = order_pathways), tbl_pathway_labels, by="pathwayID") %>% pull(pathway_label)
+
+
+metadata_scaled_AUC = metadata_scaled_AUC %>%
+                mutate(pathway_label = factor(pathway_label, levels=order_pathways_labels)) %>%
+                mutate(annot_leiden = factor(annot_leiden, levels=order_annot))
+```
+
+
+```{r}
+plt_heatmap_AUC_pathway_vertical = ggplot(metadata_scaled_AUC, aes(x=annot_leiden, y=pathway_label, fill=norm_0_1_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            scale_fill_distiller(palette = 'RdBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0)) +
+                            # scale_x_discrete(expand = c(0,0),
+                                             # guide = guide_axis(angle=45)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC scaled mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r}
+plt_heatmap_AUC_pathway_vertical
+```
+
+
+```{r}
+plt_heatmap_AUC_pathway_horizontal = ggplot(metadata_scaled_AUC, aes(x=pathway_label, y=annot_leiden, fill=norm_0_1_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            scale_fill_distiller(palette = 'RdBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0),
+                                             guide = guide_axis(angle=45)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC scaled mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r}
+plt_heatmap_AUC_pathway_horizontal
+```
+
+
+
+
+
+
+
+## Manual order
+
+```{r}
+metadata_AUC = bind_rows(metadata_AUC_KEGG, metadata_AUC_panther) %>%
+                  filter(!is.na(annot_leiden)) %>%
+                  filter(annot_leiden %in% clusterIDs_tumour)
+
+
+pathways_selected = c("mmu04622_RIG-I-like_receptor_signaling_pathway",
+                      "mmu04010_MAPK_signaling_pathway",
+                      "mmu04340_Hedgehog_signaling_pathway",
+                      "mmu04066_HIF-1_signaling_pathway",
+                      "P04393_Ras_Pathway",
+                      "P00026_Heterotrimeric_G-protein_signaling_pathway-Gi_alpha_and_Gs_alpha_mediated_pathway",
+                      "mmu04390_Hippo_signaling_pathway",
+                      "P05912_Dopamine_receptor_mediated_signaling_pathway",
+                      "P00038_JAKSTAT_signaling_pathway",
+                      "mmu04310_Wnt_signaling_pathway",
+                      "mmu04020_Calcium_signaling_pathway",
+                      "mmu04070_Phosphatidylinositol_signaling_system")
+# 
+# pathways_selected = c("P00058_mRNA_splicing",
+#                       "P05912_Dopamine_receptor_mediated_signaling_pathway",
+#                       "P00013_Cell_cycle",
+#                       "mmu04390_Hippo_signaling_pathway",
+#                       "P00021_FGF_signaling_pathway",
+#                       "P00018_EGF_receptor_signaling_pathway",
+#                       "P00025_Hedgehog_signaling_pathway",
+#                       "mmu04330_Notch_signaling_pathway",
+#                       "mmu04068_FoxO_signaling_pathway",
+#                       "P05731_GABA-B_receptor_II_signaling",
+#                       "P00047_PDGF_signaling_pathway",
+#                       "mmu04150_mTOR_signaling_pathway",
+#                       "mmu04015_Rap1_signaling_pathway",
+#                       "P00035_Interferon-gamma_signaling_pathway",
+#                       "mmu04010_MAPK_signaling_pathway",
+#                       "P00056_VEGF_signaling_pathway",
+#                       "mmu04070_Phosphatidylinositol_signaling_system",
+#                       "mmu04020_Calcium_signaling_pathway",
+#                       "mmu04080_Neuroactive_ligand-receptor_interaction",
+#                       "mmu04514_Cell_adhesion_molecules")
+
+tbl_pathway_labels = read_csv("data/AUC_pathways/pathway_labels.csv")
+
+tbl_pathway_labels_ordered = left_join(tibble(pathwayID = pathways_selected), tbl_pathway_labels, by="pathwayID")
+
+
+
+metadata_scaled_AUC = metadata_AUC %>%
+                  filter(pathway %in% pathways_selected) %>%
+                  group_by(pathway, annot_leiden) %>%
+                  summarise(mean_AUC_score = mean(AUC_score)) %>%
+                  group_by(pathway) %>%
+                  mutate(norm_0_1_mean_AUC_score = (mean_AUC_score - min(mean_AUC_score))/(max(mean_AUC_score) - min(mean_AUC_score))) %>%
+                  mutate(pathway = factor(pathway, levels=pathways_selected)) %>%
+                  mutate(annot_leiden = factor(annot_leiden, levels=annot_order)) %>%
+                  mutate(pathwayID = pathway) %>%
+                  left_join(tbl_pathway_labels, by="pathwayID") %>%
+                  mutate(pathway_label = factor(pathway_label, levels = tbl_pathway_labels_ordered$pathway_label))
+```
+
+
+```{r}
+# data_wide <- spread(olddata_long, condition, measurement)
+tbl_scores = metadata_scaled_AUC %>%
+            select(-c(mean_AUC_score, pathway_label, pathwayID)) %>%
+            tidyr::spread(pathway, norm_0_1_mean_AUC_score)
+
+cmat = as.matrix(tbl_scores %>% select(-annot_leiden))
+rownames(cmat) = tbl_scores %>% pull(annot_leiden)
+
+c <- cor(cmat, method="spearman")
+d <- as.dist(1-c)  # because correlation is a similarity measure and
+mat_cluster_cols <- hclust(d)
+
+c <- cor(t(cmat), method="spearman")
+d <- as.dist(1-c)  # because correlation is a similarity measure and
+mat_cluster_rows <- hclust(d)
+
+order_annot = rownames(cmat)[mat_cluster_rows$order]
+order_pathways = colnames(cmat)[mat_cluster_cols$order]
+order_pathways_labels = left_join(tibble(pathwayID = order_pathways), tbl_pathway_labels, by="pathwayID") %>% pull(pathway_label)
+
+
+metadata_scaled_AUC = metadata_scaled_AUC %>%
+                mutate(pathway_label = factor(pathway_label, levels=order_pathways_labels)) %>%
+                mutate(annot_leiden = factor(annot_leiden, levels=order_annot))
+```
+
+
+```{r}
+plt_heatmap_AUC_pathway_RG_vertical = ggplot(metadata_scaled_AUC, aes(x=annot_leiden, y=pathway_label, fill=norm_0_1_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            scale_fill_distiller(palette = 'RdBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0)) +
+                            # scale_x_discrete(expand = c(0,0),
+                                             # guide = guide_axis(angle=45)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC scaled mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r}
+plt_heatmap_AUC_pathway_RG_vertical
+```
+
+
+```{r}
+plt_heatmap_AUC_pathway_RG_horizontal = ggplot(metadata_scaled_AUC, aes(x=pathway_label, y=annot_leiden, fill=norm_0_1_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            scale_fill_distiller(palette = 'RdBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0),
+                                             guide = guide_axis(angle=45)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC scaled mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r}
+plt_heatmap_AUC_pathway_RG_horizontal
+```
+
+
+# Export
+
+```{r}
+ggsave("figures/figure_Ependymoma_2020/heatmap_AUC_pathways_annot_Ependymoma_2020_vertical.pdf", plot=plt_heatmap_AUC_pathway_vertical, height=7, width=9, units="cm")
+
+ggsave("figures/figure_Ependymoma_2020/heatmap_AUC_pathways_RG_annot_Ependymoma_2020_vertical.pdf", plot=plt_heatmap_AUC_pathway_RG_vertical, height=6, width=9, units="cm")
+```

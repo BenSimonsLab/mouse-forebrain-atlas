@@ -1,0 +1,375 @@
+---
+title: "Figure 1 [Overview]"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+Overview of the developmental data-set.
+
+
+```{r setup, message=FALSE, warning=TRUE}
+knitr::opts_chunk$set(autodep = TRUE)
+library(ggplot2)
+library(viridis)
+library(patchwork)
+library(ggrepel)
+ 
+library(readr)
+library(dplyr)
+library(tibble)
+
+library(knitr)
+library(kableExtra)
+
+library(reticulate)
+
+source("code/core_settings.R")
+source("code/core_functions.R")
+```
+
+```{r}
+# set parameters
+fileID = "normal"
+leiden_res = 'leiden_0_4'
+leiden_res_annot = 'annot_leiden_0_4'
+
+adata_path = paste0('data/forebrain_', fileID, '.h5ad')
+```
+
+```{r}
+#repl_python()
+py_run_string("import numpy as np")
+py_run_string("import anndata as ad")
+
+py_run_string("adata = ad.read_h5ad(r.adata_path)")
+```
+
+
+```{r, message=FALSE, warning=TRUE}
+metadata_scanpy = as_tibble(py$adata$obs, rownames="cellID") %>%
+                    rename(mt_frac = percent_mito) %>%
+                    mutate(UMAP_dim1 = py$adata$obsm[['X_umap']][,1],
+                           UMAP_dim2 = py$adata$obsm[['X_umap']][,2])
+
+metadata_experiment = read_tsv("data/metadata_experiment.tsv")
+results_cyclone = read_csv("data/cyclone/cyclone_merged.csv.gz", col_types="ccddd") %>%
+                    mutate(sampleID = sapply(cellID, function(cell) strsplit(cell, split="-")[[1]][3])) %>%
+                    left_join(metadata_experiment, by="sampleID") %>%
+                    mutate(cellID = gsub("-1", "", cellID)) %>%
+                    select(cellID, cyclone, cyclone_G1, cyclone_S, cyclone_G2M)
+
+results_logreg = read_csv(paste0("data/logreg/logreg_Zeisel_2018_normal.csv.gz"))
+
+
+# filter QC
+metadata = left_join(metadata_scanpy, results_cyclone, by="cellID") %>%
+              mutate(cyclone = factor(cyclone, levels=c("G1", "S", "G2M"))) %>%
+              mutate(timepoint = factor(timepoint, levels=unique(timepoint)[order(unique(postnatal_day))])) %>%
+              left_join(results_logreg, by="cellID") %>%
+              mutate(leiden = get(leiden_res))
+```
+
+```{r}
+metadata = metadata %>%
+            mutate(prediction_TaxonomyRank1 = gsub("Neurons", "Neuronal", prediction_TaxonomyRank1)) %>%
+            mutate(prediction_TaxonomyRank1 = gsub("^Glia$", "Glial", prediction_TaxonomyRank1)) %>%
+            mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+            mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp)) %>%
+            mutate(annot_leiden = plyr::revalue(annot_leiden, c("[unclear/debris]" = NA)))
+```
+
+
+
+# Timepoints
+
+
+```{r}
+colour_map = c("E12.5"="#fdcc8a",
+              "E14.5"="#fc8d59",
+              "E16.5"="#d7301f",
+              "P0"="#bdc9e1",
+              "P2"="#74a9cf",
+              "P7"="#0570b0",
+              "P13"="#d9d9d9",
+              "P19"="#bdbdbd",
+              "P39"="#969696",
+              "P111"="#636363",
+              "P365"="#252525")
+
+library(ggrastr)
+                            
+plt_UMAP_day = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=timepoint)) +
+                            # geom_point(size=0.05, alpha=0.8, shape=16) +
+                            # geom_point_rast(size=0.05, alpha=0.8, shape=16, raster.dpi=300) +
+                            # geom_point_rast(size=0.05, alpha=0.8, shape=16, raster.dpi=600) +
+                            geom_point_rast(size=0.1, stroke=0, alpha=0.8, shape=16, raster.dpi=600) +
+                            # scale_colour_viridis(discrete=T) +
+                            scale_color_manual(values=colour_map) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Time point") +
+                            guides(colour = guide_legend(override.aes = list(size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+```
+
+```{r}
+plt_UMAP_day
+```
+
+# Logreg & RNA velocity
+
+
+```{r}
+library(png)
+library(grid)
+
+
+tbl_annot_coarse_empty = tibble(annot_coarse = factor(c("Neuronal", "Glial", "Immune", "Vascular/other"), levels=c("Neuronal", "Glial", "Immune", "Vascular/other")),
+                                UMAP_dim1 = c(0, 1, 0, 1),
+                                UMAP_dim2 = c(0, 1, 0, 1))
+
+plt_UMAP_empty = ggplot(tbl_annot_coarse_empty, aes(x=UMAP_dim1, y=UMAP_dim2, colour=annot_coarse)) +
+                            # geom_blank() +
+                            geom_point(shape=16, alpha=0) +
+                            scale_color_manual(values=c("Neuronal"="#00BCF4",
+                                                        "Glial"="#F8766D",
+                                                        "Immune"="#7CAE00",
+                                                        "Vascular/other"="#C77CFF"), drop=FALSE) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Logreg [Zeisel 2018]") +
+                            guides(colour = guide_legend(override.aes = list(alpha=1, size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+
+
+
+img_velo = readPNG("figures/figure_1/scvelo/scvelo_stochastic_normal_logreg_Zeisel_2018_dpi_600_no_legend.png")
+g_velo = rasterGrob(img_velo, interpolate=TRUE)
+
+plt_velocyto = plt_UMAP_empty +
+                  annotation_custom(g_velo, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf)
+```
+
+```{r}
+plt_velocyto
+```
+
+
+# Cluster annotation
+
+
+```{r}
+library(ggrepel)
+library(ggthemes)
+library(ggrastr)
+
+plot_UMAP_leiden <- function(leiden_key){
+  
+  metadata = metadata %>%
+              mutate(leiden = get(leiden_key))
+              
+  cl_cent = metadata %>%
+                  select(UMAP_dim1, UMAP_dim2, leiden) %>%
+                  group_by(leiden) %>%
+                  summarize_all(mean)
+  
+  # randomise order for plot
+  plt_UMAP_leiden = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=leiden)) +
+                              # geom_point(size=0.2, alpha=0.8, shape=16) +
+                              # geom_point_rast(size=0.2, alpha=0.8, shape=16, raster.dpi=300) +
+                              # geom_point_rast(size=0.2, alpha=0.8, shape=16, raster.dpi=600) +
+                              geom_point_rast(size=0.3, stroke=0, alpha=0.8, shape=16, raster.dpi=600) +
+                              geom_label_repel(aes(x=UMAP_dim1, y=UMAP_dim2, label=leiden),
+                                      fill='white', colour='black', label.size=NA,
+                                      alpha=0.9, label.padding = 0.1, point.padding = 0,
+                                      data=cl_cent, size=1.78, show.legend=FALSE, inherit.aes=F) +
+                              scale_colour_manual(values=celltype_colours) +
+                              theme_publication +
+                              labs(x="UMAP 1", y="UMAP 2") +
+                              theme(axis.text.x=element_blank(),
+                                    axis.ticks.x=element_blank(),
+                                    axis.text.y=element_blank(),
+                                    axis.ticks.y=element_blank()) +
+                              # guides(color = guide_legend(override.aes = list(size=3))) +
+                              # labs(colour="Leiden")
+                              labs(title=paste0(leiden_key)) +
+                              theme(legend.position="none")
+
+  return(plt_UMAP_leiden)
+}
+```
+
+```{r}
+plt_UMAP_annot_full = plot_UMAP_leiden("annot_leiden")
+plt_UMAP_annot_full
+```
+
+
+
+```{r}
+library(ggrepel)
+library(ggthemes)
+
+tbl_labels = tibble(leiden = names(celltype_colours),
+                    cluster_label = 1:length(celltype_colours))
+
+
+plot_UMAP_leiden <- function(leiden_key){
+  
+  metadata = metadata %>%
+              mutate(leiden = get(leiden_key))
+
+              
+  cl_cent = metadata %>%
+                  select(UMAP_dim1, UMAP_dim2, leiden) %>%
+                  group_by(leiden) %>%
+                  summarize_all(mean) %>%
+                  left_join(tbl_labels, by="leiden")
+  
+  
+  # randomise order for plot
+  plt_UMAP_leiden = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=leiden)) +
+                              # geom_point(size=0.2, alpha=0.8, shape=16) +
+                              # geom_point_rast(size=0.2, alpha=0.8, shape=16, raster.dpi=600) +
+                              geom_point_rast(size=0.3, stroke=0, alpha=0.8, shape=16, raster.dpi=600) +
+                              geom_label_repel(aes(x=UMAP_dim1, y=UMAP_dim2, label=cluster_label),
+                                      fill='white', colour='black', label.size=NA,
+                                      alpha=0.9, label.padding = 0.15, point.padding = 0,
+                                      data=cl_cent, size=1.78, show.legend=FALSE, inherit.aes=F) +
+                              # geom_label_repel(aes(x=UMAP_dim1, y=UMAP_dim2, label=leiden),
+                              #         fill='white', colour='black', label.size=NA,
+                              #         alpha=0.9, label.padding = 0.1, point.padding = 0,
+                              #         data=cl_cent, size=1.78, show.legend=FALSE, inherit.aes=F) +
+                              scale_colour_manual(values=celltype_colours) +
+                              theme_publication +
+                              labs(x="UMAP 1", y="UMAP 2") +
+                              theme(axis.text.x=element_blank(),
+                                    axis.ticks.x=element_blank(),
+                                    axis.text.y=element_blank(),
+                                    axis.ticks.y=element_blank()) +
+                              # guides(color = guide_legend(override.aes = list(size=3))) +
+                              # labs(colour="Leiden")
+                              theme(legend.position="none")
+
+  return(plt_UMAP_leiden)
+}
+```
+
+```{r}
+plt_labels = ggplot(tbl_labels, aes(x=1, y=factor(leiden , levels=rev(leiden)), fill=leiden)) +
+                  theme_void() +
+                  geom_label(aes(label=cluster_label), size=1.78, label.padding = unit(0.15, "lines"), label.size=NA, alpha=0.9) +
+                  # geom_text(aes(x=1.5, label=factor(leiden, levels=rev(leiden))), size=1.78) +
+                  theme(axis.text.y=element_text(size=5, hjust=0)) +
+                  scale_y_discrete(position = "right") +
+                  scale_fill_manual(values=celltype_colours) +
+                  theme(legend.position="none")
+
+# plt_labels
+```
+
+
+
+```{r}
+panel_UMAP_annot = plot_UMAP_leiden("annot_leiden") + plt_labels + plot_layout(widths = c(3, 0.15))
+panel_UMAP_annot
+```
+
+
+# Cluster annotation & fractions
+
+```{r, message=FALSE, warning=TRUE}
+tbl_stats = metadata %>%
+                mutate(annot = get("annot_leiden")) %>%
+                filter(!is.na(annot)) %>%
+                group_by(sampleID) %>%
+                mutate(n_sample = n()) %>%
+                ungroup() %>%
+                group_by(sampleID, annot) %>%
+                mutate(sample_annot_frac = n()/n_sample) %>%
+                select(sampleID, annot, sample_annot_frac, timepoint) %>%
+                distinct() %>%
+                group_by(timepoint, annot) %>%
+                summarise(timepoint_annot_frac = mean(sample_annot_frac)) %>%
+                mutate(annot = factor(annot, levels=rev(names(celltype_colours)))) %>%
+                mutate(sum_frac = sum(timepoint_annot_frac)) %>%
+                mutate(timepoint_annot_frac = timepoint_annot_frac/sum_frac) %>%
+                ungroup() %>%
+                mutate(sum_frac = sum(timepoint_annot_frac)) %>%
+                mutate(annot_total_frac = timepoint_annot_frac/sum_frac) %>%
+                group_by(annot) %>%
+                mutate(sum_frac = sum(timepoint_annot_frac)) %>%
+                mutate(annot_norm_annot_frac = timepoint_annot_frac/sum_frac) %>%
+                ungroup()
+
+
+plt_cluster_fractions = ggplot(tbl_stats %>% filter(annot_norm_annot_frac >= 0.01), aes(timepoint, annot, size=annot_norm_annot_frac, colour=annot)) +
+                            geom_point() +
+                            scale_colour_manual(values=celltype_colours) +
+                            theme_publication +
+                            labs(x=NULL, y=NULL) +
+                            theme(axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            scale_size_continuous(range = c(0, 2.0), breaks = c(0.05, 0.25, 0.5), labels=c("0.05", "0.25", "0.5")) +
+                            theme(legend.position="top") +
+                            guides(colour=FALSE) +
+                            labs(size="") +
+                            theme(legend.margin=margin(-1.5, 0, -1.5, 0, unit='cm')) +
+                            theme(legend.background=element_blank())
+                            # theme(legend.position="none")
+
+# plt_cluster_fractions
+```
+
+```{r, fig.asp=0.6}
+panel_full = plot_UMAP_leiden("annot_leiden") + plt_labels + plt_cluster_fractions + plot_layout(widths = c(3, 0.15, 1))
+panel_full
+```
+
+# Export figures
+
+```{r}
+ggsave("figures/figure_1/figure_1_UMAP_timepoints.pdf", plot = plt_UMAP_day,
+      height=5, width=8, units="cm")
+ggsave("figures/figure_1/figure_1_UMAP_logreg_velocyto.pdf", plot = plt_velocyto,
+      height=5, width=9, units="cm")
+
+
+panel_1_timepoint_logreg_horizontal = plt_UMAP_day + plt_velocyto + plot_layout(widths = c(1, 1))
+panel_1_timepoint_logreg_vertical = plt_UMAP_day + plt_velocyto + plot_layout(ncol=1, heights = c(1, 1))
+# 
+ggsave("figures/figure_1/figure_1_panel_1_horizontal.pdf", plot = panel_1_timepoint_logreg_horizontal,
+      height=6, width=18.3, units="cm")
+ggsave("figures/figure_1/figure_1_panel_1_vertical.pdf", plot = panel_1_timepoint_logreg_vertical,
+      height=10, width=9.15, units="cm")
+
+
+
+ggsave("figures/figure_1/dotplot_cluster_fractions.pdf", plot = plt_cluster_fractions + theme(legend.margin=margin(0, 0, -0.3, 0, unit='cm')),
+      height=9.5, width=4.4, units="cm")
+
+
+ggsave("figures/figure_1/UMAP_annot_full.pdf", plot = panel_UMAP_annot,
+      height=9.5, width=13.9, units="cm")
+ggsave("figures/figure_1/UMAP_annot_full_dotplot_annot_frac.pdf", plot = panel_full,
+      height=10, width=18.3, units="cm")
+```

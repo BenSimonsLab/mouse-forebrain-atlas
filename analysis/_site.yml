@@ -1,0 +1,126 @@
+name: "Mouse Forebrain Atlas"
+output_dir: ../docs
+navbar:
+  title: "Mouse Brain Development"
+  left:
+  - text: Home
+    href: index.html
+  - text: Analysis
+    menu:
+    - text: QC
+      href: brain-dev-QC.html
+    - text: Overview
+      href: brain-dev-overview.html
+    - text: Timepoints
+      menu:
+      - text: E12.5
+        menu:
+        - text: E12.5 [full]
+          href: brain-dev-E12_5.html
+        - text: E12.5 [neuronal & glial]
+          href: brain-dev-E12_5_subset_neuronal_glial.html
+      - text: E14.5
+        menu:
+        - text: E14.5 [full]
+          href: brain-dev-E14_5.html
+        - text: E14.5 [neuronal & glial]
+          href: brain-dev-E14_5_subset_neuronal_glial.html
+      - text: E16.5
+        menu:
+        - text: E16.5 [full]
+          href: brain-dev-E16_5.html
+        - text: E16.5 [neuronal & glial]
+          href: brain-dev-E16_5_subset_neuronal_glial.html
+      - text: P0
+        menu:
+        - text: P0 [full]
+          href: brain-dev-P0.html
+        - text: P0 [neuronal & glial]
+          href: brain-dev-P0_subset_neuronal_glial.html
+      - text: P2
+        menu:
+        - text: P2 [full]
+          href: brain-dev-P2.html
+        - text: P2 [neuronal & glial]
+          href: brain-dev-P2_subset_neuronal_glial.html
+      - text: P7
+        menu:
+        - text: P7 [full]
+          href: brain-dev-P7.html
+        - text: P7 [neuronal & glial]
+          href: brain-dev-P7_subset_neuronal_glial.html
+      - text: P13
+        menu:
+        - text: P13 [full]
+          href: brain-dev-P13.html
+        - text: P13 [neuronal & glial]
+          href: brain-dev-P13_subset_neuronal_glial.html
+      - text: P19
+        menu:
+        - text: P19 [full]
+          href: brain-dev-P19.html
+        - text: P19 [neuronal & glial]
+          href: brain-dev-P19_subset_neuronal_glial.html
+      - text: P39
+        menu:
+        - text: P39 [full]
+          href: brain-dev-P39.html
+        - text: P39 [neuronal & glial]
+          href: brain-dev-P39_subset_neuronal_glial.html
+      - text: P111
+        menu:
+        - text: P111 [full]
+          href: brain-dev-P111.html
+        - text: P111 [neuronal & glial]
+          href: brain-dev-P111_subset_neuronal_glial.html
+      - text: P365
+        menu:
+        - text: P365 [full]
+          href: brain-dev-P365.html
+        - text: P365 [neuronal & glial]
+          href: brain-dev-P365_subset_neuronal_glial.html
+    - text: Subsets
+      menu:
+      - text: Embryonic RG
+        href: brain-dev-embryonic_RG.html
+      - text: Neuroblasts
+        href: brain-dev-NBs.html
+      - text: Ependymal cells
+        href: brain-dev-ependymal_cells.html
+      - text: OPCs
+        href: brain-dev-OPCs.html
+    - text: External
+      menu:
+      - text: GBM - Richards 2021
+        href: external_GBM_Richards_2021.html
+      - text: NSCs - Kalamakis 2019
+        href: external_NSCs_Kalamakis_2019.html
+      - text: Pipeline comparison
+        href: external_pipeline_comparison.html
+  - text: Figures
+    menu:
+    - text: Figure 1
+      href: figure1.html
+    - text: Overview
+      href: figure_overview.html
+    - text: Neuronal & glial
+      href: figure_neuronal_glial.html
+    - text: Neuronal & glial lineage tree
+      href: figure_neuronal_glial_lineage_tree.html
+    - text: Embryonic RG
+      href: figure_embryonic_RG.html
+    - text: OPCs
+      href: figure_OPCs.html
+    - text: Neuroblasts
+      href: figure_NBs.html
+    - text: QC
+      href: figure_QC.html
+  - text: Query Atlas
+    href: shiny_app.html
+
+output:
+  workflowr::wflow_html:
+    toc: yes
+    toc_float: yes
+    theme: cosmo
+    highlight: textmate

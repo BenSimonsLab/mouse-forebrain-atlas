@@ -1,0 +1,323 @@
+---
+title: "QC"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+
+Initialize & load packages.
+
+```{r setup, message=FALSE, warning=TRUE}
+library(ggplot2)
+library(viridis)
+library(patchwork)
+
+library(readr)
+library(dplyr)
+library(tibble)
+```
+
+
+
+```{r, message=FALSE, warning=TRUE}
+source("code/core_settings.R")
+source("code/core_functions.R")
+```
+
+```{r, message=FALSE, warning=TRUE}
+sampleID_order = c("E12.5 SOX2_-ve", "E12.5 SOX2_+ve",
+                   "E14.5 SOX2_-ve", "E14.5 SOX2_+ve",
+                   "E16.5 SOX2_-ve", "E16.5 SOX2_+ve",
+                   "P0 SOX2_-ve", "P0 SOX2_+ve",
+                   "P2 SOX2_-ve", "P2 SOX2_+ve",
+                   "P7 SOX2_-ve", "P7 SOX2_+ve",
+                   "P13 SOX2_-ve", "P13 SOX2_+ve",
+                   "P19 SOX2_-ve", "P19 SOX2_+ve",
+                   "P39 SOX2_-ve", "P39 SOX2_+ve",
+                   "P111 SOX2_-ve", "P111 SOX2_+ve",
+                   "P365 SOX2_-ve", "P365 SOX2_+ve")
+
+
+metadata_QC = read_csv("data/metadata_QC_normal.csv.gz") %>%
+                mutate(sampleID = factor(paste0(timepoint, " ", gate),
+                       levels=sampleID_order))  %>%
+                mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+                mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp))
+```
+
+```{r}
+cut_n_genes = 1000
+```
+
+```{r}
+plt_bar_cellcounts = ggplot(metadata_QC, aes(x=sampleID, fill=gate_gfp)) +
+                        geom_bar() +
+                        # scale_fill_manual(values=c("SOX2_-ve"="#696969", "SOX2_+ve"="#AECEA5")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        theme_publication +
+                        labs(x="", y="Number of Cells") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_bar_cellcounts
+```
+
+
+```{r}
+plt_violin_genes = ggplot(metadata_QC, aes(x=sampleID, y=n_genes, fill=gate_gfp)) +
+                        geom_violin() +
+                        # geom_jitter(size=0.2, position=position_jitter(0.2)) +
+                        geom_hline(yintercept=cut_n_genes, colour="red") +
+                        # scale_fill_manual(values=c("SOX2_-ve"="#696969", "SOX2_+ve"="#AECEA5")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        theme_publication +
+                        labs(x="", y="Number of Expressed Genes") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_violin_genes
+```
+
+```{r}
+plt_violin_counts = ggplot(metadata_QC, aes(x=sampleID, y=n_counts, fill=gate_gfp)) +
+                        geom_violin() +
+                        # geom_jitter(size=0.2, position=position_jitter(0.2)) +
+                        # scale_fill_manual(values=c("SOX2_-ve"="#696969", "SOX2_+ve"="#AECEA5")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        theme_publication +
+                        labs(x="", y="Counts") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_violin_counts
+```
+
+```{r, fig.asp=0.4}
+metadata_QC = metadata_QC %>% mutate(QC_pass_genes = n_genes > cut_n_genes)
+
+plt_scatter_counts_genes = ggplot(metadata_QC, aes(x=n_counts, y=n_genes, colour=QC_pass_genes)) +
+                        geom_point() +
+                        theme_publication +
+                        labs(x="Counts", y="Number of Genes") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top")
+
+
+plt_scatterdens_mt = ggplot(metadata_QC, aes(x=n_counts, y=n_genes)) +
+                        geom_hex() +
+                        scale_fill_continuous(type = "viridis") +
+                        geom_hline(yintercept=cut_n_genes, colour="red") +
+                        theme_publication +
+                        labs(x="Counts", y="Number of Genes") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top")
+
+plt_scatter_counts_genes | plt_scatterdens_mt
+```
+
+```{r, fig.asp=1.3}
+plt_scatter_counts_genes = ggplot(metadata_QC, aes(x=n_counts, y=n_genes, colour=QC_pass_genes)) +
+                        geom_point(size=0.2) +
+                        facet_wrap(~sampleID, ncol=4) +
+                        theme_publication +
+                        labs(x="Counts", y="Number of Genes") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top")
+                        
+plt_scatter_counts_genes
+```
+
+### Filter
+
+```{r}
+plt_bar_cellcounts = ggplot(metadata_QC, aes(x=sampleID, fill=QC_pass_genes)) +
+                        geom_bar() +
+                        theme_publication +
+                        labs(x="", y="Number of Cells") +
+                        labs(fill="QC Pass") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_bar_cellcounts
+```
+
+```{r}
+metadata_QC = metadata_QC %>% filter(QC_pass_genes)
+```
+
+
+
+
+# MT Reads
+
+Calculate cut-off per sample due to different mt distributions.
+
+```{r}
+metadata_QC = metadata_QC %>%
+                mutate(mt_max = 0.15)
+
+sampleIDs = metadata_QC %>% pull(sampleID) %>% unique()
+
+for (sample in sampleIDs){
+  mt_fraction = metadata_QC %>%
+                  filter(sampleID == sample) %>%
+                  pull(percent_mito)
+
+  mt_p = pnorm(mt_fraction, mean = median(mt_fraction), sd = mad(mt_fraction), lower.tail = FALSE)
+  mt_lim = min(mt_fraction[which(p.adjust(mt_p, method = "fdr") < 0.05)])
+  
+  metadata_QC = metadata_QC %>% mutate(mt_max = if_else(sampleID == sample, min(0.15, mt_lim), mt_max))
+}
+```
+
+```{r}
+metadata_QC = metadata_QC %>% mutate(QC_pass_mt = percent_mito < mt_max)
+```
+
+
+```{r}
+plt_violin_mt = ggplot(metadata_QC, aes(x=sampleID, y=percent_mito, fill=gate_gfp)) +
+                        geom_violin() +
+                        geom_hline(yintercept=0.15, colour="#AA0000", linetype="dashed") +
+                        geom_errorbar(aes(y=NULL, ymax=mt_max, ymin=mt_max), colour="#AA0000") +
+                        # scale_fill_manual(values=c("SOX2_-ve"="#696969", "SOX2_+ve"="#AECEA5")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        theme_publication +
+                        labs(x="", y="Fraction of MT Reads") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_violin_mt
+```
+
+```{r, fig.asp=0.4}
+plt_scatter_mt = ggplot(slice(metadata_QC, sample(1:n())), aes(x=n_counts, y=percent_mito, colour=QC_pass_mt)) +
+                        # geom_jitter(size=0.2, position=position_jitter(0.2)) +
+                        geom_point(size=0.4) +
+                        theme_publication +
+                        labs(x="Counts", y="Fraction of MT Reads") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+
+plt_scatterdens_mt = ggplot(metadata_QC, aes(x=n_counts, y=percent_mito)) +
+                        # geom_jitter(size=0.2, position=position_jitter(0.2)) +
+                        geom_hex() +
+                        # geom_hline(yintercept=mt_lim, colour="red") +
+                        scale_fill_continuous(type = "viridis") +
+                        theme_publication +
+                        labs(x="Counts", y="Fraction of MT Reads") +
+                        labs(fill="Counts") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_scatter_mt | plt_scatterdens_mt
+```
+
+```{r, fig.asp=1.3}
+plt_scatter_mt = ggplot(metadata_QC, aes(x=n_counts, y=percent_mito, colour=QC_pass_mt)) +
+                        # geom_jitter(size=0.2, position=position_jitter(0.2)) +
+                        geom_point(size=0.4) +
+                        facet_wrap(~sampleID, ncol=4) +
+                        theme_publication +
+                        labs(x="Counts", y="Fraction of MT Reads") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_scatter_mt
+```
+
+
+### Filter
+
+```{r}
+plt_bar_cellcounts = ggplot(metadata_QC, aes(x=sampleID, fill=QC_pass_mt)) +
+                        geom_bar() +
+                        theme_publication +
+                        labs(x="", y="Number of Cells") +
+                        labs(fill="QC Pass") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_bar_cellcounts
+```
+
+```{r}
+metadata_QC = metadata_QC %>% filter(QC_pass_mt)
+```
+
+
+```{r}
+plt_violin_mt = ggplot(metadata_QC, aes(x=sampleID, y=percent_mito, fill=gate_gfp)) +
+                        geom_violin() +
+                        # scale_fill_manual(values=c("SOX2_-ve"="#696969", "SOX2_+ve"="#AECEA5")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        theme_publication +
+                        labs(x="", y="Fraction of MT Reads") +
+                        labs(fill="Gate") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1))
+
+plt_violin_mt
+```
+
+
+
+# Doublets
+
+Use scrublet to identify doublets.
+
+```{r}
+metadata_QC = metadata_QC %>%
+                mutate(QC_pass_doublet = !is_doublet)
+```
+
+```{r}
+plt_bar_cellcounts = ggplot(metadata_QC, aes(x=sampleID, fill=QC_pass_doublet)) +
+                        geom_bar() +
+                        theme_publication +
+                        labs(x="", y="Number of Cells") +
+                        labs(fill="QC Pass") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
+
+plt_bar_cellcounts
+```
+
+
+```{r}
+metadata_QC = metadata_QC %>% filter(QC_pass_doublet)
+```
+
+```{r}
+plt_bar_cellcounts = ggplot(metadata_QC, aes(x=sampleID, fill=QC_pass_doublet)) +
+                        geom_bar() +
+                        theme_publication +
+                        labs(x="", y="Number of Cells") +
+                        labs(fill="QC Pass") +
+                        theme(legend.position="top") +
+                        theme(axis.text.x=element_text(angle=90, hjust=1, vjust=0.5))
+
+plt_bar_cellcounts
+```
+
+
+# Export
+
+```{r}
+write_csv(metadata_QC, "data/metadata_QC_normal_pass.csv.gz")
+```

@@ -1,0 +1,513 @@
+---
+title: "Figure - Neuronal & glial lineage tree"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+---
+title: "URD - Neuronal & glial"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+
+
+```{r setup, message=FALSE, warning=TRUE}
+library(ggplot2)
+library(viridis)
+library(patchwork)
+
+library(readr)
+library(dplyr)
+library(tibble)
+```
+
+
+
+```{r, message=FALSE, warning=TRUE}
+source("code/core_settings.R")
+source("code/core_functions.R")
+```
+
+```{r}
+library(URD)
+
+objectURD.tree = readRDS(file = "data/URD/objectURD_tree_local_sigma_root_2_pseudotime_100_normal_subset_neuronal_glial_cleaned_subsample_30k.rds")
+```
+
+
+```{r}
+plotTree_adjusted <- function(object, label=NULL, label.type="search", title=label, legend=T, legend.title="", legend.point.size=6*cell.size, plot.tree=T, tree.alpha=1, tree.size=0.4, plot.cells=T, cell.alpha=0.6, cell.size=0.2, label.x=T, label.segments=F, discrete.ignore.na=F, color.tree=NULL, continuous.colors=NULL, discrete.colors=NULL, color.limits=NULL, symmetric.color.scale=NULL, hide.y.ticks=T, cells.highlight=NULL, cells.highlight.alpha=1, cells.highlight.size=2) {
+  
+  # Validation of parameters
+  if (class(object) != "URD") stop("Must provide an URD object as input to plotTree.")
+  if (length(object@tree) == 0) stop("A tree has not been calculated for this URD object. buildTree must be run first.")
+  
+  # Grab various layouts from the object
+  segment.layout <- object@tree$segment.layout
+  tree.layout <- object@tree$tree.layout
+  if (plot.cells) cell.layout <- object@tree$cell.layout
+
+  # Initialize ggplot and do basic formatting
+  the.plot <- ggplot()
+  if (hide.y.ticks) {
+    the.plot <- the.plot + scale_y_reverse(c(1,0), name="Pseudotime", breaks=NULL)
+  } else {
+    the.plot <- the.plot + scale_y_reverse(c(1,0), name="Pseudotime", breaks=seq(0, 1, 0.1))
+  }
+  the.plot <- the.plot + theme_bw() + theme(axis.ticks=element_blank(), panel.grid.major=element_blank(), panel.grid.minor=element_blank())
+  the.plot <- the.plot + labs(x="", title=title, color=legend.title)
+  
+  # Extract expression information
+  if (!is.null(label)) {
+    # Grab data to color by
+    if (length(label) > 1) stop("Cannot plot by multiple labels simultaneously.")
+    color.data <- data.for.plot(object, label=label, label.type=label.type, as.color=F, as.discrete.list = T, cells.use=rownames(object@diff.data))
+    color.discrete <- color.data$discrete
+    color.data <- data.frame(cell=names(color.data$data), value=color.data$data, node=object@diff.data[,"node"], stringsAsFactors=F)
+  }
+  
+  # Summarize expression information if plotting tree
+  if (plot.tree && !is.null(label)) {
+    if (!color.discrete) {
+      # Mean expression per node
+      node.data <- aggregate(color.data$value, by=list(color.data$node), FUN=mean.of.logs)
+      rownames(node.data) <- node.data$Group.1
+      node.data$n <- unlist(lapply(object@tree$cells.in.nodes, length))[node.data$Group.1]
+    } else {
+      # If uniform expression, then give that output, otherwise give NA.
+      node.data <- aggregate(color.data$value, by=list(color.data$node), FUN=output.uniform, na.rm=discrete.ignore.na)
+      rownames(node.data) <- node.data$Group.1
+      node.data$n <- unlist(lapply(object@tree$cells.in.nodes, length))[node.data$Group.1]
+    }
+    
+    # Color segments according to their expression of their end node
+    # (Replace -0 nodes with -1 for getting expression data.)
+    tree.layout$node.1 <- gsub("-0","-1",tree.layout$node.1)
+    tree.layout$node.2 <- gsub("-0","-1",tree.layout$node.2)
+    tree.layout[,"expression"] <- node.data[tree.layout$node.2,"x"]
+  }  
+  
+  # Figure out color limits if plotting a non-discrete label
+  if (!is.null(label) && !color.discrete && is.null(color.limits)) {
+    # Take from cells if plotting, otherwise from tree.
+    if (plot.cells) color.data.for.scale <- color.data$value else color.data.for.scale <- tree.layout$expression
+    # Set symmetric scale automatically if not provided
+    if (is.null(symmetric.color.scale)) {
+      if (min(color.data.for.scale) < 0) symmetric.color.scale <- T else symmetric.color.scale <- F
+    }
+    if (symmetric.color.scale) {
+      color.mv <- max(abs(color.data.for.scale))
+      color.limits <- c(-1*color.mv, color.mv)
+    } else {
+      color.max <- max(color.data.for.scale)
+      color.min <- min(c(0, color.data.for.scale))
+      color.limits <- c(color.min, color.max)
+    }
+  } else if (!is.null(label) && !color.discrete) {
+    if (abs(color.limits[1]) == abs(color.limits[2])) symmetric.color.scale <- T else symmetric.color.scale <- F
+  }
+  
+  # Add cells to graph
+  if (plot.cells) {
+    if (!is.null(label)) {
+      # Add color info to cell.layout
+      if (color.discrete) {
+        cell.layout$expression <- as.factor(color.data[cell.layout$cell, "value"])
+      } else {
+        cell.layout$expression <- color.data[cell.layout$cell, "value"]
+      }
+      # With color
+      if (is.null(cells.highlight)) {
+        # Plot all cells.
+        # the.plot <- the.plot + geom_point(data=cell.layout, aes(x=x,y=y,color=expression), alpha=cell.alpha, size=cell.size, shape=16)
+        the.plot <- the.plot + geom_point_rast(data=cell.layout, aes(x=x,y=y,color=expression), alpha=cell.alpha, size=cell.size, shape=16, stroke=0, raster.dpi=300)
+        # geom_point_rast(size=0.05, alpha=0.8, shape=16 +
+      } else {
+        # Plot non-highlighted cells
+        # the.plot <- the.plot + geom_point(data=cell.layout[setdiff(rownames(cell.layout), cells.highlight),], aes(x=x,y=y,color=expression), alpha=cell.alpha, size=cell.size, shape=16)
+        the.plot <- the.plot + geom_point_rast(data=cell.layout[setdiff(rownames(cell.layout), cells.highlight),], aes(x=x,y=y,color=expression), alpha=cell.alpha, size=cell.size, shape=16, stroke=0, raster.dpi=300)
+        # Plot highlighted cells
+        # the.plot <- the.plot + geom_point(data=cell.layout[cells.highlight,], aes(x=x,y=y,color=expression), alpha=cells.highlight.alpha, size=cells.highlight.size, shape=16)
+        the.plot <- the.plot + geom_point_rast(data=cell.layout[cells.highlight,], aes(x=x,y=y,color=expression), alpha=cells.highlight.alpha, size=cells.highlight.size, shape=16, stroke=0, raster.dpi=300)
+      }
+    } else {
+      # Just plain black if no label
+      # the.plot <- the.plot + geom_point(data=cell.layout, aes(x=x,y=y), alpha=cell.alpha, size=cell.size, shape=16)
+      the.plot <- the.plot + geom_point_rast(data=cell.layout, aes(x=x,y=y), alpha=cell.alpha, size=cell.size, shape=16, stroke=0, raster.dpi=300)
+    }
+  }
+  
+  # If color.tree is NULL, determine what it should be.
+  if (is.null(label)) {
+    color.tree <- FALSE
+  } else if (is.null(color.tree)) {
+    if (color.discrete) color.tree <- F else color.tree <- T
+  }
+  
+  # Add tree to graph
+  if (plot.tree) {
+    if (!is.null(label) && color.tree) {
+      # With color, if desired
+      the.plot <- the.plot + geom_segment(data=tree.layout, aes(x=x1, y=y1, xend=x2, yend=y2, color=expression), alpha=tree.alpha, size=tree.size, lineend="square") 
+    } else {
+      # Just plain black if no label
+      the.plot <- the.plot + geom_segment(data=tree.layout, aes(x=x1, y=y1, xend=x2, yend=y2), color='black', alpha=tree.alpha, size=tree.size, lineend="square")
+    }
+  }
+  
+  # Add color
+  if (!is.null(label)) {
+    if (!color.discrete) {
+      if (is.null(continuous.colors)) {
+        the.plot <- the.plot + scale_color_gradientn(colors=defaultURDContinuousColors(with.grey=T, symmetric=symmetric.color.scale), limits=color.limits)
+      } else {
+        the.plot <- the.plot + scale_color_gradientn(colors=continuous.colors, limits=color.limits)
+      }
+    } else {
+      if (!is.null(discrete.colors)) {
+        the.plot <- the.plot + scale_color_manual(values=discrete.colors)
+      }
+    }
+  }
+  
+  # Remove legend if desired
+  if (!legend) {
+    the.plot <- the.plot + guides(color=FALSE, shape=FALSE)
+  } else if (!is.null(label) && color.discrete) {
+    # Otherwise, make the legend points bigger if coloring by a discrete value
+    # the.plot <- the.plot + guides(color=guide_legend(override.aes = list(size=legend.point.size, alpha=1)))
+    the.plot <- the.plot + guides(colour = guide_legend(override.aes = list(size=2, alpha=1),
+                                 keyheight=0.3,
+                                 default.unit="cm"))
+
+  }
+  
+  # Label segment names along the x-axis?
+  if (label.x) {
+    if ("segment.names" %in% names(object@tree)) {
+      # Add segment names to segment.layout
+      segment.layout$name <- object@tree$segment.names[segment.layout$segment]
+      tip.layout <- segment.layout[complete.cases(segment.layout),]
+    } else {
+      # Find terminal tips
+      tip.layout <- segment.layout[which(segment.layout$segment %in% object@tree$tips),]
+      tip.layout$name <- as.character(tip.layout$segment)
+    }
+    the.plot <- the.plot + scale_x_continuous(breaks=as.numeric(tip.layout$x), labels=as.character(tip.layout$name))
+    if (any(unlist(lapply(tip.layout$name, nchar)) > 2)) {
+      the.plot <- the.plot + theme(axis.text.x = element_text(angle = 68, vjust = 1, hjust=1))
+    }
+  } else {
+    the.plot <- the.plot + theme(axis.text.x=element_blank())
+  }
+  
+  # Label the segments with their number?
+  if (label.segments) {
+    segment.labels <- as.data.frame(segment.layout[,c("segment","x")])
+    segment.labels$y <- apply(object@tree$segment.pseudotime.limits, 1, num.mean)[segment.labels$segment]
+    the.plot <- the.plot + geom_label(data=segment.labels, aes(x=x, y=y, label=segment), alpha=0.5)
+  }
+  
+  return(the.plot)
+}
+
+
+output.uniform <- function(x, na.rm=F) {
+  y <- unique(as.character(x))
+  if (na.rm) y <- setdiff(y, NA)
+  if (length(y) == 1) return(y) else return(NA)
+}
+```
+
+
+
+## Annotation
+
+```{r, fig.asp=0.8}
+# celltype_colours = c(# neuronal
+#                     "Embryonic RG" = "#635547",
+#                     "Juvenile RG & TAPs" = "#DABE99",
+#                     "Gliogenic precursors (aNSCs)" = "#8DB5CE",
+#                     "Gliogenic precursors (APCs)" = "#3F84AA",
+#                     "Quiescent NSCs [1]" = "#005579",
+#                     "Quiescent NSCs [2]" = "#C9EBFB",
+#                     "Early EmNBs [1]" = "#9E6762",
+#                     "Early EmNBs [2]" = "#9E627B",
+#                     "GE NBs [1]" = "#C19F70",
+#                     "GE NBs [2]" = "#139992",
+#                     "Hippocampal NBs [1]" = "#C594BF",
+#                     "Hippocampal NBs [2]" = "#0F4A9C",
+#                     "OPCs" = "#B51D8D",
+#                     "ImPreMDs" = "#532C8A",
+#                     "Oligodendrocytes [1]" = "#8870AD",
+#                     "Oligodendrocytes [2]" = "#CC7818",
+#                     "Ependymal cells" = "#FBBE92",
+#                     "GABAergic INs" = "#FACB12",
+#                     "ImStNeurons" = "#F397C0")
+
+
+celltype_colours = c("Embryonic RG" = "#C72228",
+                    "Juvenile RG & TAPs" = "#FF891C",
+                    "Gliogenic precursors (aNSCs)" = "#FACB12",
+                    "Gliogenic precursors (APCs)" = "#F9DECF",
+                    "Ependymal cells" = "#139992",
+                    "Quiescent NSCs [1]" = "#DABE99",
+                    "Quiescent NSCs (dorsal)" = "#DABE99",
+                    "Quiescent NSCs [2]" = "#DABE99",
+                    "Quiescent NSCs (ventral)" = "#635547",
+                    "Early EmNBs [1]" = "#005579",
+                    "Early EmNBs [2]" = "#8DB5CE",
+                    "GABAergic INs" = "#CDE088",
+                    "GE NBs [1]" = "#3F84AA",
+                    "GE NBs [2]" = "#F7F79E",
+                    "ImStNeurons" = "#B51D8D",
+                    "Hippocampal NBs [1]" = "#C594BF",
+                    "Hippocampal NBs [2]" = "#F397C0",
+                    "OPCs" = "#C9EBFB",
+                    "ImPreMDs" = "#CC7818",
+                    "PreM-ODCs" = "#CC7818",
+                    "Oligodendrocytes [1]" = "#8870AD",
+                    "Oligodendrocytes [2]" = "#532C8A")
+
+
+# set parameters
+fileID = "normal_subset_neuronal_glial_cleaned"
+leiden_res = 'leiden_0_4'
+leiden_res_annot = 'annot_leiden_0_4'
+
+adata_path = paste0('data/forebrain_', fileID, '.h5ad')
+
+py_run_string("import numpy as np")
+py_run_string("import anndata as ad")
+
+py_run_string("adata = ad.read_h5ad(r.adata_path)")
+
+
+metadata_scanpy = as_tibble(py$adata$obs, rownames="cellID") %>%
+                    rename(mt_frac = percent_mito) %>%
+                    mutate(UMAP_dim1 = py$adata$obsm[['X_umap']][,1],
+                           UMAP_dim2 = py$adata$obsm[['X_umap']][,2])
+
+metadata_experiment = read_tsv("data/metadata_experiment.tsv")
+results_cyclone = read_csv("data/cyclone/cyclone_merged.csv.gz", col_types="ccddd") %>%
+                    mutate(sampleID = sapply(cellID, function(cell) strsplit(cell, split="-")[[1]][3])) %>%
+                    left_join(metadata_experiment, by="sampleID") %>%
+                    mutate(cellID = gsub("-1", "", cellID)) %>%
+                    select(cellID, cyclone, cyclone_G1, cyclone_S, cyclone_G2M)
+
+results_logreg = read_csv(paste0("data/logreg/logreg_Zeisel_2018_normal.csv.gz"))
+
+
+
+# filter QC
+metadata = left_join(metadata_scanpy, results_cyclone, by="cellID") %>%
+              mutate(cyclone = factor(cyclone, levels=c("G1", "S", "G2M"))) %>%
+              mutate(timepoint = factor(timepoint, levels=unique(timepoint)[order(unique(postnatal_day))])) %>%
+              left_join(results_logreg, by="cellID") %>%
+              mutate(leiden = get(leiden_res))  %>%
+              mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+              mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp))
+
+
+
+objectURD.tree@meta$annot_leiden = left_join(objectURD.tree@meta %>% select(-annot_leiden), metadata %>% select(cellID, annot_leiden), by="cellID") %>%
+  pull(annot_leiden) %>% as.factor()
+
+
+objectURD.tree@meta$annot_leiden = factor(objectURD.tree@meta$annot_leiden, levels = names(celltype_colours))
+
+objectURD.tree <- nameSegments(objectURD.tree,
+                               segments=c("1","2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"),
+                               segment.names = c("APCs", "Early EmNBs [1]", "Early EmNBs [2]", "Ependymal cells", "GABAergicINs", "GE NBs [1]", "GE NBs [2]", "Hippocampal NBs [1]", "Hippocampal NBs [2]", "ImStNeurons", "Oligodendrocytes", "Quiescent NSCs (dorsal)", "Quiescent NSCs (ventral)"))
+
+
+plt_tree_annot = plotTree_adjusted(objectURD.tree, "annot_leiden", discrete.colors=celltype_colours, title="") +
+                      theme_publication +
+                      guides(x =  guide_axis(angle = 45)) +
+                      theme(plot.margin = margin(t=5.5, r=5.5, b=5.5, l=20.5, unit="pt"))
+
+plt_tree_annot
+```
+
+
+```{r}
+results_logreg = read_csv(paste0("data/logreg/logreg_Zeisel_2018_normal.csv.gz"))
+
+objectURD.tree@meta$prediction_TaxonomyRank1 = left_join(objectURD.tree@meta, results_logreg, by="cellID") %>%
+  pull(prediction_TaxonomyRank1) %>% as.factor()
+
+
+  
+celltype_colours = c("Glia" = "#f8766d",
+                     "Immune cells" = "#7cae00",
+                     "Neurons" = "#00bfc4")
+# #c77cff
+
+plt_tree_annot_zeisel = plotTree_adjusted(objectURD.tree, "prediction_TaxonomyRank1", discrete.colors=celltype_colours, cell.size=0.1, title="") +
+                      theme_publication +
+                      guides(x =  guide_axis(angle = 45))
+
+
+# 
+# # plt_tree_annot = plotTree_adjusted(objectURD.tree, "prediction_TaxonomyRank1", title="") +
+# #                       theme_publication +
+# #                       guides(x =  guide_axis(angle = 45))
+# 
+# 
+
+plt_tree_annot_zeisel
+```
+
+
+```{r, fig.asp=0.8}
+colour_map = c("E12.5"="#fdcc8a",
+              "E14.5"="#fc8d59",
+              "E16.5"="#d7301f",
+              "P0"="#bdc9e1",
+              "P2"="#74a9cf",
+              "P7"="#0570b0",
+              "P13"="#d9d9d9",
+              "P19"="#bdbdbd",
+              "P39"="#969696",
+              "P111"="#636363",
+              "P365"="#252525")
+
+objectURD.tree@meta$timepoint = factor(objectURD.tree@meta$timepoint, levels = names(colour_map))
+
+plt_tree_timepoint = plotTree_adjusted(objectURD.tree, "timepoint", discrete.colors=colour_map, title="") +
+                      theme_publication +
+                      theme(axis.text.x=element_blank(),
+                            axis.ticks.x=element_blank(),
+                            axis.text.y=element_blank(),
+                            axis.ticks.y=element_blank(),
+                            axis.title.x = element_blank(),
+                            axis.title.y = element_blank(),
+                            panel.border = element_blank())
+
+plt_tree_timepoint
+```
+
+```{r, fig.asp=0.6}
+# panel_tree = plt_tree_annot + plt_tree_timepoint
+# panel_tree
+```
+
+
+```{r}
+plt_tree_expr_Sox2 = plotTree_adjusted(objectURD.tree, "Sox2", cell.size=0.1, title="") +
+                      theme_publication +
+                      scale_colour_viridis(option="magma") +
+                      # scale_colour_viridis() +
+                      # scale_fill_viridis() +
+                      # guides(x =  guide_axis(angle = 45)) +
+                      theme(axis.text.x=element_blank(),
+                            axis.ticks.x=element_blank(),
+                            axis.text.y=element_blank(),
+                            axis.ticks.y=element_blank(),
+                            axis.title.x = element_blank(),
+                            axis.title.y = element_blank(),
+                            panel.border = element_blank()) +
+                      guides(colour = guide_colorbar(barwidth = 0.3,
+                                                   barheight = 2)) +
+                      labs(colour = "Sox2 [log1p]")
+
+plt_tree_expr_Sox2
+
+
+plt_tree_expr_Sox2_rescaled = plt_tree_expr_Sox2 + scale_colour_viridis(option="magma", rescaler = function(x, from = NULL) {
+  ifelse(x<2, 
+         scales::rescale(x,
+                         to = c(0, 0.5),
+                         from = c(min(x, na.rm = TRUE), 2)),
+         scales::rescale(x,
+                         to = c(0.5, 1),
+                         from = c(2, max(x, na.rm = TRUE))))}) +
+         guides(colour = guide_colorbar(barwidth = 0.3,
+                                      barheight = 2)) +
+         labs(colour = "Sox2 [log1p]") + 
+         scale_fill_viridis(option="magma", rescaler = function(x, from = NULL) {
+           ifelse(x<2, 
+                  scales::rescale(x,
+                                  to = c(0, 0.5),
+                                  from = c(min(x, na.rm = TRUE), 2)),
+                  scales::rescale(x,
+                                  to = c(0.5, 1),
+                                  from = c(2, max(x, na.rm = TRUE))))})
+```
+
+## GFP expression
+
+```{r}
+objectURD.tree@meta$gate_gfp = left_join(objectURD.tree@meta, metadata %>% select(cellID, gate_gfp), by="cellID") %>%
+pull(gate_gfp) %>% as.factor()
+```
+
+
+```{r}
+plt_tree_GFP = plotTree_adjusted(objectURD.tree, "gate_gfp", cell.size=0.1, title="") +
+                      theme_publication +
+                      scale_colour_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                      # scale_colour_viridis(option="magma") +
+                      # scale_colour_viridis() +
+                      # scale_fill_viridis() +
+                      # guides(x =  guide_axis(angle = 45)) +
+                      theme(axis.text.x=element_blank(),
+                            axis.ticks.x=element_blank(),
+                            axis.text.y=element_blank(),
+                            axis.ticks.y=element_blank(),
+                            axis.title.x = element_blank(),
+                            axis.title.y = element_blank(),
+                            panel.border = element_blank()) +
+                      labs(colour = "FACS gate")
+
+plt_tree_GFP
+```
+
+
+
+# Export figures
+
+```{r}
+# ggsave("figures/figure_ependymal_cells/UMAP_annot_ependymal_cells.pdf", plot=plt_UMAP_annot_ependymal, height=5, width=8.15, units="cm")
+# ggsave("figures/figure_ependymal_cells/UMAP_timepoints_ependymal_cells.pdf", plot=plt_UMAP_day, height=5, width=9.15, units="cm")
+
+# annotation
+ggsave("figures/figure_neuronal_glial_lineage_tree/URD_tree_annot_neuronal_glial.pdf", plot=plt_tree_annot, height=8, width=12.15, units="cm")
+
+
+# annot Zeisel
+ggsave("figures/figure_neuronal_glial_lineage_tree/URD_tree_annot_Zeisel_neuronal_glial.pdf", plot=plt_tree_annot_zeisel, height=8, width=12.15, units="cm")
+
+
+# timepoints
+ggsave("figures/figure_neuronal_glial_lineage_tree/URD_tree_timepoint_neuronal_glial.pdf", plot=plt_tree_timepoint, height=4, width=6, units="cm")
+
+
+# gene expr
+ggsave("figures/figure_neuronal_glial_lineage_tree/URD_tree_expr_Sox2_neuronal_glial.pdf", plot=plt_tree_expr_Sox2, height=4, width=6, units="cm")
+ggsave("figures/figure_neuronal_glial_lineage_tree/URD_tree_expr_Sox2_rescaled_neuronal_glial.pdf", plot=plt_tree_expr_Sox2_rescaled, height=4, width=6, units="cm")
+
+
+ggsave("figures/figure_neuronal_glial_lineage_tree/URD_tree_GFP_neuronal_glial.pdf", plot=plt_tree_GFP, height=4, width=6, units="cm")
+
+
+
+ggsave("figures/figure_neuronal_glial_lineage_tree/URD_tree_panel_neuronal_glial.pdf", plot=plt_tree_annot + wrap_elements(full = plt_tree_timepoint / plt_tree_expr_Sox2_rescaled), height=8.5, width=18.3, units="cm")
+
+```

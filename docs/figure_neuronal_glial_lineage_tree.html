@@ -1,0 +1,1573 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Daniel J. Kunz" />
+
+
+<title>Figure - Neuronal &amp; glial lineage tree</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  { color: #cccccc; background-color: #303030; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ffcfaf; } /* Alert */
+code span.an { color: #7f9f7f; font-weight: bold; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #dca3a3; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #f0dfaf; } /* ControlFlow */
+code span.ch { color: #dca3a3; } /* Char */
+code span.cn { color: #dca3a3; font-weight: bold; } /* Constant */
+code span.co { color: #7f9f7f; } /* Comment */
+code span.cv { color: #7f9f7f; font-weight: bold; } /* CommentVar */
+code span.do { color: #7f9f7f; } /* Documentation */
+code span.dt { color: #dfdfbf; } /* DataType */
+code span.dv { color: #dcdccc; } /* DecVal */
+code span.er { color: #c3bf9f; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #c0bed1; } /* Float */
+code span.fu { color: #efef8f; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #7f9f7f; font-weight: bold; } /* Information */
+code span.kw { color: #f0dfaf; } /* Keyword */
+code span.op { color: #f0efd0; } /* Operator */
+code span.ot { color: #efef8f; } /* Other */
+code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
+code span.sc { color: #dca3a3; } /* SpecialChar */
+code span.ss { color: #cc9393; } /* SpecialString */
+code span.st { color: #cc9393; } /* String */
+code span.va { } /* Variable */
+code span.vs { color: #cc9393; } /* VerbatimString */
+code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */
+
+.sourceCode .row {
+  width: 100%;
+}
+.sourceCode {
+  overflow-x: auto;
+}
+.code-folding-btn {
+  margin-right: -30px;
+}
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Mouse Brain Development</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Analysis
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="brain-dev-QC.html">QC</a>
+    </li>
+    <li>
+      <a href="brain-dev-overview.html">Overview</a>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Timepoints</a>
+      <ul class="dropdown-menu" role="menu">
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">E12.5</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-E12_5.html">E12.5 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-E12_5_subset_neuronal_glial.html">E12.5 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">E14.5</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-E14_5.html">E14.5 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-E14_5_subset_neuronal_glial.html">E14.5 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">E16.5</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-E16_5.html">E16.5 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-E16_5_subset_neuronal_glial.html">E16.5 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P0</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P0.html">P0 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P0_subset_neuronal_glial.html">P0 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P2</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P2.html">P2 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P2_subset_neuronal_glial.html">P2 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P7</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P7.html">P7 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P7_subset_neuronal_glial.html">P7 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P13</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P13.html">P13 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P13_subset_neuronal_glial.html">P13 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P19</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P19.html">P19 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P19_subset_neuronal_glial.html">P19 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P39</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P39.html">P39 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P39_subset_neuronal_glial.html">P39 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P111</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P111.html">P111 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P111_subset_neuronal_glial.html">P111 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown-submenu">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P365</a>
+          <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="brain-dev-P365.html">P365 [full]</a>
+            </li>
+            <li>
+              <a href="brain-dev-P365_subset_neuronal_glial.html">P365 [neuronal &amp; glial]</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Subsets</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="brain-dev-embryonic_RG.html">Embryonic RG</a>
+        </li>
+        <li>
+          <a href="brain-dev-NBs.html">Neuroblasts</a>
+        </li>
+        <li>
+          <a href="brain-dev-ependymal_cells.html">Ependymal cells</a>
+        </li>
+        <li>
+          <a href="brain-dev-OPCs.html">OPCs</a>
+        </li>
+      </ul>
+    </li>
+    <li class="dropdown-submenu">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">External</a>
+      <ul class="dropdown-menu" role="menu">
+        <li>
+          <a href="external_GBM_Richards_2021.html">GBM - Richards 2021</a>
+        </li>
+        <li>
+          <a href="external_NSCs_Kalamakis_2019.html">NSCs - Kalamakis 2019</a>
+        </li>
+        <li>
+          <a href="external_pipeline_comparison.html">Pipeline comparison</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Figures
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="figure1.html">Figure 1</a>
+    </li>
+    <li>
+      <a href="figure_overview.html">Overview</a>
+    </li>
+    <li>
+      <a href="figure_neuronal_glial.html">Neuronal &amp; glial</a>
+    </li>
+    <li>
+      <a href="figure_neuronal_glial_lineage_tree.html">Neuronal &amp; glial lineage tree</a>
+    </li>
+    <li>
+      <a href="figure_embryonic_RG.html">Embryonic RG</a>
+    </li>
+    <li>
+      <a href="figure_OPCs.html">OPCs</a>
+    </li>
+    <li>
+      <a href="figure_NBs.html">Neuroblasts</a>
+    </li>
+    <li>
+      <a href="figure_QC.html">QC</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="shiny_app.html">Query Atlas</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+
+
+<h1 class="title toc-ignore">Figure - Neuronal &amp; glial lineage tree</h1>
+<h4 class="author">Daniel J. Kunz</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2021-03-23
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>forebrain-atlas_workflowr/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20210320code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20210320)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20210320code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20210320)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongda0cf96"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> da0cf96 </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongda0cf96" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version da0cf96. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Untracked files:
+    Untracked:  code/core_functions.R
+    Untracked:  code/core_functions_supp.R
+    Untracked:  code/core_settings.R
+    Untracked:  data/AUC_pathways/
+    Untracked:  data/Ependymoma_2020/
+    Untracked:  data/Richards_2021/
+    Untracked:  data/URD/
+    Untracked:  data/annot/
+    Untracked:  data/cyclone/
+    Untracked:  data/external_metadata/
+    Untracked:  data/forebrain_normal.h5ad
+    Untracked:  data/forebrain_normal_E12_5.h5ad
+    Untracked:  data/forebrain_normal_E12_5_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_E14_5.h5ad
+    Untracked:  data/forebrain_normal_E14_5_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_E16_5.h5ad
+    Untracked:  data/forebrain_normal_E16_5_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P0.h5ad
+    Untracked:  data/forebrain_normal_P0_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P111.h5ad
+    Untracked:  data/forebrain_normal_P111_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P13.h5ad
+    Untracked:  data/forebrain_normal_P13_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P19.h5ad
+    Untracked:  data/forebrain_normal_P19_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P2.h5ad
+    Untracked:  data/forebrain_normal_P2_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P365.h5ad
+    Untracked:  data/forebrain_normal_P365_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P39.h5ad
+    Untracked:  data/forebrain_normal_P39_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_P7.h5ad
+    Untracked:  data/forebrain_normal_P7_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_merged_RG_NSC_lineage.h5ad
+    Untracked:  data/forebrain_normal_merged_RG_aNSC_lineage.h5ad
+    Untracked:  data/forebrain_normal_merged_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_merged_subset_neuronal_glial_cleaned.h5ad
+    Untracked:  data/forebrain_normal_merged_subset_neuronal_glial_cleaned_harmony.h5ad
+    Untracked:  data/forebrain_normal_merged_subset_neuronal_glial_subset_RG_OPC_NSC_lineage.h5ad
+    Untracked:  data/forebrain_normal_merged_subset_neuronal_glial_subset_RG_OPC_NSC_lineage_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_OPCs.h5ad
+    Untracked:  data/forebrain_normal_subset_RG.h5ad
+    Untracked:  data/forebrain_normal_subset_aNSCs.h5ad
+    Untracked:  data/forebrain_normal_subset_embryonic_RG.h5ad
+    Untracked:  data/forebrain_normal_subset_embryonic_RG_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_embryonic_RG_cleaned_wo_gliogenic.h5ad
+    Untracked:  data/forebrain_normal_subset_ependymal.h5ad
+    Untracked:  data/forebrain_normal_subset_ependymal_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_juvenile_RG_TAPs.h5ad
+    Untracked:  data/forebrain_normal_subset_juvenile_RG_TAPs_subset_juvenile_RG.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_NBs.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_NBs_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_OPCs.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_RG.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_RG_NSC_OPC_lineage.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_RG_NSC_lineage.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_RG_NSC_lineage_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_RG_NSC_lineage_v2.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_RG_NSC_lineage_v2_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_ependymal.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_ependymal_cleaned.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_neuroblasts.h5ad
+    Untracked:  data/forebrain_normal_subset_neuronal_glial_cleaned_subset_qNSCs.h5ad
+    Untracked:  data/forebrain_normal_subset_qNSCs.h5ad
+    Untracked:  data/gene-groups/
+    Untracked:  data/logreg/
+    Untracked:  data/metadata/
+    Untracked:  data/metadata_QC_normal.csv.gz
+    Untracked:  data/metadata_QC_normal_pass.csv.gz
+    Untracked:  data/metadata_experiment.tsv
+    Untracked:  data/monocle_3/
+    Untracked:  data/pagoda/
+    Untracked:  data/scenic/
+    Untracked:  data/scrublet_scores/
+    Untracked:  data/supplementary_data/
+    Untracked:  figures/
+    Untracked:  output/normal/
+    Untracked:  output/normal_merged_RG_NSC_lineage/
+    Untracked:  output/normal_merged_RG_aNSC_lineage/
+    Untracked:  output/normal_subset_OPCs/
+    Untracked:  output/normal_subset_embryonic_RG_cleaned/
+    Untracked:  output/normal_subset_ependymal_cleaned/
+    Untracked:  output/normal_subset_neuronal_glial_cleaned_subset_NBs_cleaned/
+    Untracked:  output/normal_subset_neuronal_glial_cleaned_subset_RG_NSC_lineage/
+    Untracked:  output/normal_subset_neuronal_glial_cleaned_subset_qNSCs/
+    Untracked:  output/normal_subset_qNSCs/
+
+Unstaged changes:
+    Deleted:    analysis/about.Rmd
+    Deleted:    analysis/license.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+There are no past versions. Publish this analysis with <code>wflow_publish()</code> to start tracking its development.
+</p>
+<hr>
+</div>
+</div>
+</div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">library</span>(ggplot2)</a>
+<a class="sourceLine" id="cb1-2" title="2"><span class="kw">library</span>(viridis)</a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">library</span>(patchwork)</a>
+<a class="sourceLine" id="cb1-4" title="4"></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="kw">library</span>(readr)</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="kw">library</span>(dplyr)</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="kw">library</span>(tibble)</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">source</span>(<span class="st">&quot;code/core_settings.R&quot;</span>)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="kw">source</span>(<span class="st">&quot;code/core_functions.R&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">library</span>(URD)</a></code></pre></div>
+<pre><code>Loading required package: Matrix</code></pre>
+<pre><code>Registered S3 method overwritten by &#39;gplots&#39;:
+  method         from 
+  reorder.factor gdata</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">objectURD.tree =<span class="st"> </span><span class="kw">readRDS</span>(<span class="dt">file =</span> <span class="st">&quot;data/URD/objectURD_tree_local_sigma_root_2_pseudotime_100_normal_subset_neuronal_glial_cleaned_subsample_30k.rds&quot;</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">plotTree_adjusted &lt;-<span class="st"> </span><span class="cf">function</span>(object, <span class="dt">label=</span><span class="ot">NULL</span>, <span class="dt">label.type=</span><span class="st">&quot;search&quot;</span>, <span class="dt">title=</span>label, <span class="dt">legend=</span>T, <span class="dt">legend.title=</span><span class="st">&quot;&quot;</span>, <span class="dt">legend.point.size=</span><span class="dv">6</span><span class="op">*</span>cell.size, <span class="dt">plot.tree=</span>T, <span class="dt">tree.alpha=</span><span class="dv">1</span>, <span class="dt">tree.size=</span><span class="fl">0.4</span>, <span class="dt">plot.cells=</span>T, <span class="dt">cell.alpha=</span><span class="fl">0.6</span>, <span class="dt">cell.size=</span><span class="fl">0.2</span>, <span class="dt">label.x=</span>T, <span class="dt">label.segments=</span>F, <span class="dt">discrete.ignore.na=</span>F, <span class="dt">color.tree=</span><span class="ot">NULL</span>, <span class="dt">continuous.colors=</span><span class="ot">NULL</span>, <span class="dt">discrete.colors=</span><span class="ot">NULL</span>, <span class="dt">color.limits=</span><span class="ot">NULL</span>, <span class="dt">symmetric.color.scale=</span><span class="ot">NULL</span>, <span class="dt">hide.y.ticks=</span>T, <span class="dt">cells.highlight=</span><span class="ot">NULL</span>, <span class="dt">cells.highlight.alpha=</span><span class="dv">1</span>, <span class="dt">cells.highlight.size=</span><span class="dv">2</span>) {</a>
+<a class="sourceLine" id="cb7-2" title="2">  </a>
+<a class="sourceLine" id="cb7-3" title="3">  <span class="co"># Validation of parameters</span></a>
+<a class="sourceLine" id="cb7-4" title="4">  <span class="cf">if</span> (<span class="kw">class</span>(object) <span class="op">!=</span><span class="st"> &quot;URD&quot;</span>) <span class="kw">stop</span>(<span class="st">&quot;Must provide an URD object as input to plotTree.&quot;</span>)</a>
+<a class="sourceLine" id="cb7-5" title="5">  <span class="cf">if</span> (<span class="kw">length</span>(object<span class="op">@</span>tree) <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">stop</span>(<span class="st">&quot;A tree has not been calculated for this URD object. buildTree must be run first.&quot;</span>)</a>
+<a class="sourceLine" id="cb7-6" title="6">  </a>
+<a class="sourceLine" id="cb7-7" title="7">  <span class="co"># Grab various layouts from the object</span></a>
+<a class="sourceLine" id="cb7-8" title="8">  segment.layout &lt;-<span class="st"> </span>object<span class="op">@</span>tree<span class="op">$</span>segment.layout</a>
+<a class="sourceLine" id="cb7-9" title="9">  tree.layout &lt;-<span class="st"> </span>object<span class="op">@</span>tree<span class="op">$</span>tree.layout</a>
+<a class="sourceLine" id="cb7-10" title="10">  <span class="cf">if</span> (plot.cells) cell.layout &lt;-<span class="st"> </span>object<span class="op">@</span>tree<span class="op">$</span>cell.layout</a>
+<a class="sourceLine" id="cb7-11" title="11"></a>
+<a class="sourceLine" id="cb7-12" title="12">  <span class="co"># Initialize ggplot and do basic formatting</span></a>
+<a class="sourceLine" id="cb7-13" title="13">  the.plot &lt;-<span class="st"> </span><span class="kw">ggplot</span>()</a>
+<a class="sourceLine" id="cb7-14" title="14">  <span class="cf">if</span> (hide.y.ticks) {</a>
+<a class="sourceLine" id="cb7-15" title="15">    the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">scale_y_reverse</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>), <span class="dt">name=</span><span class="st">&quot;Pseudotime&quot;</span>, <span class="dt">breaks=</span><span class="ot">NULL</span>)</a>
+<a class="sourceLine" id="cb7-16" title="16">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-17" title="17">    the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">scale_y_reverse</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>), <span class="dt">name=</span><span class="st">&quot;Pseudotime&quot;</span>, <span class="dt">breaks=</span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.1</span>))</a>
+<a class="sourceLine" id="cb7-18" title="18">  }</a>
+<a class="sourceLine" id="cb7-19" title="19">  the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">theme_bw</span>() <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.ticks=</span><span class="kw">element_blank</span>(), <span class="dt">panel.grid.major=</span><span class="kw">element_blank</span>(), <span class="dt">panel.grid.minor=</span><span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb7-20" title="20">  the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&quot;&quot;</span>, <span class="dt">title=</span>title, <span class="dt">color=</span>legend.title)</a>
+<a class="sourceLine" id="cb7-21" title="21">  </a>
+<a class="sourceLine" id="cb7-22" title="22">  <span class="co"># Extract expression information</span></a>
+<a class="sourceLine" id="cb7-23" title="23">  <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(label)) {</a>
+<a class="sourceLine" id="cb7-24" title="24">    <span class="co"># Grab data to color by</span></a>
+<a class="sourceLine" id="cb7-25" title="25">    <span class="cf">if</span> (<span class="kw">length</span>(label) <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) <span class="kw">stop</span>(<span class="st">&quot;Cannot plot by multiple labels simultaneously.&quot;</span>)</a>
+<a class="sourceLine" id="cb7-26" title="26">    color.data &lt;-<span class="st"> </span><span class="kw">data.for.plot</span>(object, <span class="dt">label=</span>label, <span class="dt">label.type=</span>label.type, <span class="dt">as.color=</span>F, <span class="dt">as.discrete.list =</span> T, <span class="dt">cells.use=</span><span class="kw">rownames</span>(object<span class="op">@</span>diff.data))</a>
+<a class="sourceLine" id="cb7-27" title="27">    color.discrete &lt;-<span class="st"> </span>color.data<span class="op">$</span>discrete</a>
+<a class="sourceLine" id="cb7-28" title="28">    color.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">cell=</span><span class="kw">names</span>(color.data<span class="op">$</span>data), <span class="dt">value=</span>color.data<span class="op">$</span>data, <span class="dt">node=</span>object<span class="op">@</span>diff.data[,<span class="st">&quot;node&quot;</span>], <span class="dt">stringsAsFactors=</span>F)</a>
+<a class="sourceLine" id="cb7-29" title="29">  }</a>
+<a class="sourceLine" id="cb7-30" title="30">  </a>
+<a class="sourceLine" id="cb7-31" title="31">  <span class="co"># Summarize expression information if plotting tree</span></a>
+<a class="sourceLine" id="cb7-32" title="32">  <span class="cf">if</span> (plot.tree <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span><span class="kw">is.null</span>(label)) {</a>
+<a class="sourceLine" id="cb7-33" title="33">    <span class="cf">if</span> (<span class="op">!</span>color.discrete) {</a>
+<a class="sourceLine" id="cb7-34" title="34">      <span class="co"># Mean expression per node</span></a>
+<a class="sourceLine" id="cb7-35" title="35">      node.data &lt;-<span class="st"> </span><span class="kw">aggregate</span>(color.data<span class="op">$</span>value, <span class="dt">by=</span><span class="kw">list</span>(color.data<span class="op">$</span>node), <span class="dt">FUN=</span>mean.of.logs)</a>
+<a class="sourceLine" id="cb7-36" title="36">      <span class="kw">rownames</span>(node.data) &lt;-<span class="st"> </span>node.data<span class="op">$</span>Group<span class="fl">.1</span></a>
+<a class="sourceLine" id="cb7-37" title="37">      node.data<span class="op">$</span>n &lt;-<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(object<span class="op">@</span>tree<span class="op">$</span>cells.in.nodes, length))[node.data<span class="op">$</span>Group<span class="fl">.1</span>]</a>
+<a class="sourceLine" id="cb7-38" title="38">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-39" title="39">      <span class="co"># If uniform expression, then give that output, otherwise give NA.</span></a>
+<a class="sourceLine" id="cb7-40" title="40">      node.data &lt;-<span class="st"> </span><span class="kw">aggregate</span>(color.data<span class="op">$</span>value, <span class="dt">by=</span><span class="kw">list</span>(color.data<span class="op">$</span>node), <span class="dt">FUN=</span>output.uniform, <span class="dt">na.rm=</span>discrete.ignore.na)</a>
+<a class="sourceLine" id="cb7-41" title="41">      <span class="kw">rownames</span>(node.data) &lt;-<span class="st"> </span>node.data<span class="op">$</span>Group<span class="fl">.1</span></a>
+<a class="sourceLine" id="cb7-42" title="42">      node.data<span class="op">$</span>n &lt;-<span class="st"> </span><span class="kw">unlist</span>(<span class="kw">lapply</span>(object<span class="op">@</span>tree<span class="op">$</span>cells.in.nodes, length))[node.data<span class="op">$</span>Group<span class="fl">.1</span>]</a>
+<a class="sourceLine" id="cb7-43" title="43">    }</a>
+<a class="sourceLine" id="cb7-44" title="44">    </a>
+<a class="sourceLine" id="cb7-45" title="45">    <span class="co"># Color segments according to their expression of their end node</span></a>
+<a class="sourceLine" id="cb7-46" title="46">    <span class="co"># (Replace -0 nodes with -1 for getting expression data.)</span></a>
+<a class="sourceLine" id="cb7-47" title="47">    tree.layout<span class="op">$</span>node<span class="fl">.1</span> &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-0&quot;</span>,<span class="st">&quot;-1&quot;</span>,tree.layout<span class="op">$</span>node<span class="fl">.1</span>)</a>
+<a class="sourceLine" id="cb7-48" title="48">    tree.layout<span class="op">$</span>node<span class="fl">.2</span> &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;-0&quot;</span>,<span class="st">&quot;-1&quot;</span>,tree.layout<span class="op">$</span>node<span class="fl">.2</span>)</a>
+<a class="sourceLine" id="cb7-49" title="49">    tree.layout[,<span class="st">&quot;expression&quot;</span>] &lt;-<span class="st"> </span>node.data[tree.layout<span class="op">$</span>node<span class="fl">.2</span>,<span class="st">&quot;x&quot;</span>]</a>
+<a class="sourceLine" id="cb7-50" title="50">  }  </a>
+<a class="sourceLine" id="cb7-51" title="51">  </a>
+<a class="sourceLine" id="cb7-52" title="52">  <span class="co"># Figure out color limits if plotting a non-discrete label</span></a>
+<a class="sourceLine" id="cb7-53" title="53">  <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(label) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span>color.discrete <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">is.null</span>(color.limits)) {</a>
+<a class="sourceLine" id="cb7-54" title="54">    <span class="co"># Take from cells if plotting, otherwise from tree.</span></a>
+<a class="sourceLine" id="cb7-55" title="55">    <span class="cf">if</span> (plot.cells) color.data.for.scale &lt;-<span class="st"> </span>color.data<span class="op">$</span>value <span class="cf">else</span> color.data.for.scale &lt;-<span class="st"> </span>tree.layout<span class="op">$</span>expression</a>
+<a class="sourceLine" id="cb7-56" title="56">    <span class="co"># Set symmetric scale automatically if not provided</span></a>
+<a class="sourceLine" id="cb7-57" title="57">    <span class="cf">if</span> (<span class="kw">is.null</span>(symmetric.color.scale)) {</a>
+<a class="sourceLine" id="cb7-58" title="58">      <span class="cf">if</span> (<span class="kw">min</span>(color.data.for.scale) <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>) symmetric.color.scale &lt;-<span class="st"> </span>T <span class="cf">else</span> symmetric.color.scale &lt;-<span class="st"> </span>F</a>
+<a class="sourceLine" id="cb7-59" title="59">    }</a>
+<a class="sourceLine" id="cb7-60" title="60">    <span class="cf">if</span> (symmetric.color.scale) {</a>
+<a class="sourceLine" id="cb7-61" title="61">      color.mv &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">abs</span>(color.data.for.scale))</a>
+<a class="sourceLine" id="cb7-62" title="62">      color.limits &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="op">-</span><span class="dv">1</span><span class="op">*</span>color.mv, color.mv)</a>
+<a class="sourceLine" id="cb7-63" title="63">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-64" title="64">      color.max &lt;-<span class="st"> </span><span class="kw">max</span>(color.data.for.scale)</a>
+<a class="sourceLine" id="cb7-65" title="65">      color.min &lt;-<span class="st"> </span><span class="kw">min</span>(<span class="kw">c</span>(<span class="dv">0</span>, color.data.for.scale))</a>
+<a class="sourceLine" id="cb7-66" title="66">      color.limits &lt;-<span class="st"> </span><span class="kw">c</span>(color.min, color.max)</a>
+<a class="sourceLine" id="cb7-67" title="67">    }</a>
+<a class="sourceLine" id="cb7-68" title="68">  } <span class="cf">else</span> <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(label) <span class="op">&amp;&amp;</span><span class="st"> </span><span class="op">!</span>color.discrete) {</a>
+<a class="sourceLine" id="cb7-69" title="69">    <span class="cf">if</span> (<span class="kw">abs</span>(color.limits[<span class="dv">1</span>]) <span class="op">==</span><span class="st"> </span><span class="kw">abs</span>(color.limits[<span class="dv">2</span>])) symmetric.color.scale &lt;-<span class="st"> </span>T <span class="cf">else</span> symmetric.color.scale &lt;-<span class="st"> </span>F</a>
+<a class="sourceLine" id="cb7-70" title="70">  }</a>
+<a class="sourceLine" id="cb7-71" title="71">  </a>
+<a class="sourceLine" id="cb7-72" title="72">  <span class="co"># Add cells to graph</span></a>
+<a class="sourceLine" id="cb7-73" title="73">  <span class="cf">if</span> (plot.cells) {</a>
+<a class="sourceLine" id="cb7-74" title="74">    <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(label)) {</a>
+<a class="sourceLine" id="cb7-75" title="75">      <span class="co"># Add color info to cell.layout</span></a>
+<a class="sourceLine" id="cb7-76" title="76">      <span class="cf">if</span> (color.discrete) {</a>
+<a class="sourceLine" id="cb7-77" title="77">        cell.layout<span class="op">$</span>expression &lt;-<span class="st"> </span><span class="kw">as.factor</span>(color.data[cell.layout<span class="op">$</span>cell, <span class="st">&quot;value&quot;</span>])</a>
+<a class="sourceLine" id="cb7-78" title="78">      } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-79" title="79">        cell.layout<span class="op">$</span>expression &lt;-<span class="st"> </span>color.data[cell.layout<span class="op">$</span>cell, <span class="st">&quot;value&quot;</span>]</a>
+<a class="sourceLine" id="cb7-80" title="80">      }</a>
+<a class="sourceLine" id="cb7-81" title="81">      <span class="co"># With color</span></a>
+<a class="sourceLine" id="cb7-82" title="82">      <span class="cf">if</span> (<span class="kw">is.null</span>(cells.highlight)) {</a>
+<a class="sourceLine" id="cb7-83" title="83">        <span class="co"># Plot all cells.</span></a>
+<a class="sourceLine" id="cb7-84" title="84">        <span class="co"># the.plot &lt;- the.plot + geom_point(data=cell.layout, aes(x=x,y=y,color=expression), alpha=cell.alpha, size=cell.size, shape=16)</span></a>
+<a class="sourceLine" id="cb7-85" title="85">        the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">geom_point_rast</span>(<span class="dt">data=</span>cell.layout, <span class="kw">aes</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>y,<span class="dt">color=</span>expression), <span class="dt">alpha=</span>cell.alpha, <span class="dt">size=</span>cell.size, <span class="dt">shape=</span><span class="dv">16</span>, <span class="dt">stroke=</span><span class="dv">0</span>, <span class="dt">raster.dpi=</span><span class="dv">300</span>)</a>
+<a class="sourceLine" id="cb7-86" title="86">        <span class="co"># geom_point_rast(size=0.05, alpha=0.8, shape=16 +</span></a>
+<a class="sourceLine" id="cb7-87" title="87">      } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-88" title="88">        <span class="co"># Plot non-highlighted cells</span></a>
+<a class="sourceLine" id="cb7-89" title="89">        <span class="co"># the.plot &lt;- the.plot + geom_point(data=cell.layout[setdiff(rownames(cell.layout), cells.highlight),], aes(x=x,y=y,color=expression), alpha=cell.alpha, size=cell.size, shape=16)</span></a>
+<a class="sourceLine" id="cb7-90" title="90">        the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">geom_point_rast</span>(<span class="dt">data=</span>cell.layout[<span class="kw">setdiff</span>(<span class="kw">rownames</span>(cell.layout), cells.highlight),], <span class="kw">aes</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>y,<span class="dt">color=</span>expression), <span class="dt">alpha=</span>cell.alpha, <span class="dt">size=</span>cell.size, <span class="dt">shape=</span><span class="dv">16</span>, <span class="dt">stroke=</span><span class="dv">0</span>, <span class="dt">raster.dpi=</span><span class="dv">300</span>)</a>
+<a class="sourceLine" id="cb7-91" title="91">        <span class="co"># Plot highlighted cells</span></a>
+<a class="sourceLine" id="cb7-92" title="92">        <span class="co"># the.plot &lt;- the.plot + geom_point(data=cell.layout[cells.highlight,], aes(x=x,y=y,color=expression), alpha=cells.highlight.alpha, size=cells.highlight.size, shape=16)</span></a>
+<a class="sourceLine" id="cb7-93" title="93">        the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">geom_point_rast</span>(<span class="dt">data=</span>cell.layout[cells.highlight,], <span class="kw">aes</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>y,<span class="dt">color=</span>expression), <span class="dt">alpha=</span>cells.highlight.alpha, <span class="dt">size=</span>cells.highlight.size, <span class="dt">shape=</span><span class="dv">16</span>, <span class="dt">stroke=</span><span class="dv">0</span>, <span class="dt">raster.dpi=</span><span class="dv">300</span>)</a>
+<a class="sourceLine" id="cb7-94" title="94">      }</a>
+<a class="sourceLine" id="cb7-95" title="95">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-96" title="96">      <span class="co"># Just plain black if no label</span></a>
+<a class="sourceLine" id="cb7-97" title="97">      <span class="co"># the.plot &lt;- the.plot + geom_point(data=cell.layout, aes(x=x,y=y), alpha=cell.alpha, size=cell.size, shape=16)</span></a>
+<a class="sourceLine" id="cb7-98" title="98">      the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">geom_point_rast</span>(<span class="dt">data=</span>cell.layout, <span class="kw">aes</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>y), <span class="dt">alpha=</span>cell.alpha, <span class="dt">size=</span>cell.size, <span class="dt">shape=</span><span class="dv">16</span>, <span class="dt">stroke=</span><span class="dv">0</span>, <span class="dt">raster.dpi=</span><span class="dv">300</span>)</a>
+<a class="sourceLine" id="cb7-99" title="99">    }</a>
+<a class="sourceLine" id="cb7-100" title="100">  }</a>
+<a class="sourceLine" id="cb7-101" title="101">  </a>
+<a class="sourceLine" id="cb7-102" title="102">  <span class="co"># If color.tree is NULL, determine what it should be.</span></a>
+<a class="sourceLine" id="cb7-103" title="103">  <span class="cf">if</span> (<span class="kw">is.null</span>(label)) {</a>
+<a class="sourceLine" id="cb7-104" title="104">    color.tree &lt;-<span class="st"> </span><span class="ot">FALSE</span></a>
+<a class="sourceLine" id="cb7-105" title="105">  } <span class="cf">else</span> <span class="cf">if</span> (<span class="kw">is.null</span>(color.tree)) {</a>
+<a class="sourceLine" id="cb7-106" title="106">    <span class="cf">if</span> (color.discrete) color.tree &lt;-<span class="st"> </span>F <span class="cf">else</span> color.tree &lt;-<span class="st"> </span>T</a>
+<a class="sourceLine" id="cb7-107" title="107">  }</a>
+<a class="sourceLine" id="cb7-108" title="108">  </a>
+<a class="sourceLine" id="cb7-109" title="109">  <span class="co"># Add tree to graph</span></a>
+<a class="sourceLine" id="cb7-110" title="110">  <span class="cf">if</span> (plot.tree) {</a>
+<a class="sourceLine" id="cb7-111" title="111">    <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(label) <span class="op">&amp;&amp;</span><span class="st"> </span>color.tree) {</a>
+<a class="sourceLine" id="cb7-112" title="112">      <span class="co"># With color, if desired</span></a>
+<a class="sourceLine" id="cb7-113" title="113">      the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">geom_segment</span>(<span class="dt">data=</span>tree.layout, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>y1, <span class="dt">xend=</span>x2, <span class="dt">yend=</span>y2, <span class="dt">color=</span>expression), <span class="dt">alpha=</span>tree.alpha, <span class="dt">size=</span>tree.size, <span class="dt">lineend=</span><span class="st">&quot;square&quot;</span>) </a>
+<a class="sourceLine" id="cb7-114" title="114">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-115" title="115">      <span class="co"># Just plain black if no label</span></a>
+<a class="sourceLine" id="cb7-116" title="116">      the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">geom_segment</span>(<span class="dt">data=</span>tree.layout, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>y1, <span class="dt">xend=</span>x2, <span class="dt">yend=</span>y2), <span class="dt">color=</span><span class="st">&#39;black&#39;</span>, <span class="dt">alpha=</span>tree.alpha, <span class="dt">size=</span>tree.size, <span class="dt">lineend=</span><span class="st">&quot;square&quot;</span>)</a>
+<a class="sourceLine" id="cb7-117" title="117">    }</a>
+<a class="sourceLine" id="cb7-118" title="118">  }</a>
+<a class="sourceLine" id="cb7-119" title="119">  </a>
+<a class="sourceLine" id="cb7-120" title="120">  <span class="co"># Add color</span></a>
+<a class="sourceLine" id="cb7-121" title="121">  <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(label)) {</a>
+<a class="sourceLine" id="cb7-122" title="122">    <span class="cf">if</span> (<span class="op">!</span>color.discrete) {</a>
+<a class="sourceLine" id="cb7-123" title="123">      <span class="cf">if</span> (<span class="kw">is.null</span>(continuous.colors)) {</a>
+<a class="sourceLine" id="cb7-124" title="124">        the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_gradientn</span>(<span class="dt">colors=</span><span class="kw">defaultURDContinuousColors</span>(<span class="dt">with.grey=</span>T, <span class="dt">symmetric=</span>symmetric.color.scale), <span class="dt">limits=</span>color.limits)</a>
+<a class="sourceLine" id="cb7-125" title="125">      } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-126" title="126">        the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_gradientn</span>(<span class="dt">colors=</span>continuous.colors, <span class="dt">limits=</span>color.limits)</a>
+<a class="sourceLine" id="cb7-127" title="127">      }</a>
+<a class="sourceLine" id="cb7-128" title="128">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-129" title="129">      <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(discrete.colors)) {</a>
+<a class="sourceLine" id="cb7-130" title="130">        the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span>discrete.colors)</a>
+<a class="sourceLine" id="cb7-131" title="131">      }</a>
+<a class="sourceLine" id="cb7-132" title="132">    }</a>
+<a class="sourceLine" id="cb7-133" title="133">  }</a>
+<a class="sourceLine" id="cb7-134" title="134">  </a>
+<a class="sourceLine" id="cb7-135" title="135">  <span class="co"># Remove legend if desired</span></a>
+<a class="sourceLine" id="cb7-136" title="136">  <span class="cf">if</span> (<span class="op">!</span>legend) {</a>
+<a class="sourceLine" id="cb7-137" title="137">    the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">guides</span>(<span class="dt">color=</span><span class="ot">FALSE</span>, <span class="dt">shape=</span><span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb7-138" title="138">  } <span class="cf">else</span> <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(label) <span class="op">&amp;&amp;</span><span class="st"> </span>color.discrete) {</a>
+<a class="sourceLine" id="cb7-139" title="139">    <span class="co"># Otherwise, make the legend points bigger if coloring by a discrete value</span></a>
+<a class="sourceLine" id="cb7-140" title="140">    <span class="co"># the.plot &lt;- the.plot + guides(color=guide_legend(override.aes = list(size=legend.point.size, alpha=1)))</span></a>
+<a class="sourceLine" id="cb7-141" title="141">    the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">guides</span>(<span class="dt">colour =</span> <span class="kw">guide_legend</span>(<span class="dt">override.aes =</span> <span class="kw">list</span>(<span class="dt">size=</span><span class="dv">2</span>, <span class="dt">alpha=</span><span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb7-142" title="142">                                 <span class="dt">keyheight=</span><span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb7-143" title="143">                                 <span class="dt">default.unit=</span><span class="st">&quot;cm&quot;</span>))</a>
+<a class="sourceLine" id="cb7-144" title="144"></a>
+<a class="sourceLine" id="cb7-145" title="145">  }</a>
+<a class="sourceLine" id="cb7-146" title="146">  </a>
+<a class="sourceLine" id="cb7-147" title="147">  <span class="co"># Label segment names along the x-axis?</span></a>
+<a class="sourceLine" id="cb7-148" title="148">  <span class="cf">if</span> (label.x) {</a>
+<a class="sourceLine" id="cb7-149" title="149">    <span class="cf">if</span> (<span class="st">&quot;segment.names&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">names</span>(object<span class="op">@</span>tree)) {</a>
+<a class="sourceLine" id="cb7-150" title="150">      <span class="co"># Add segment names to segment.layout</span></a>
+<a class="sourceLine" id="cb7-151" title="151">      segment.layout<span class="op">$</span>name &lt;-<span class="st"> </span>object<span class="op">@</span>tree<span class="op">$</span>segment.names[segment.layout<span class="op">$</span>segment]</a>
+<a class="sourceLine" id="cb7-152" title="152">      tip.layout &lt;-<span class="st"> </span>segment.layout[<span class="kw">complete.cases</span>(segment.layout),]</a>
+<a class="sourceLine" id="cb7-153" title="153">    } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-154" title="154">      <span class="co"># Find terminal tips</span></a>
+<a class="sourceLine" id="cb7-155" title="155">      tip.layout &lt;-<span class="st"> </span>segment.layout[<span class="kw">which</span>(segment.layout<span class="op">$</span>segment <span class="op">%in%</span><span class="st"> </span>object<span class="op">@</span>tree<span class="op">$</span>tips),]</a>
+<a class="sourceLine" id="cb7-156" title="156">      tip.layout<span class="op">$</span>name &lt;-<span class="st"> </span><span class="kw">as.character</span>(tip.layout<span class="op">$</span>segment)</a>
+<a class="sourceLine" id="cb7-157" title="157">    }</a>
+<a class="sourceLine" id="cb7-158" title="158">    the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks=</span><span class="kw">as.numeric</span>(tip.layout<span class="op">$</span>x), <span class="dt">labels=</span><span class="kw">as.character</span>(tip.layout<span class="op">$</span>name))</a>
+<a class="sourceLine" id="cb7-159" title="159">    <span class="cf">if</span> (<span class="kw">any</span>(<span class="kw">unlist</span>(<span class="kw">lapply</span>(tip.layout<span class="op">$</span>name, nchar)) <span class="op">&gt;</span><span class="st"> </span><span class="dv">2</span>)) {</a>
+<a class="sourceLine" id="cb7-160" title="160">      the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x =</span> <span class="kw">element_text</span>(<span class="dt">angle =</span> <span class="dv">68</span>, <span class="dt">vjust =</span> <span class="dv">1</span>, <span class="dt">hjust=</span><span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb7-161" title="161">    }</a>
+<a class="sourceLine" id="cb7-162" title="162">  } <span class="cf">else</span> {</a>
+<a class="sourceLine" id="cb7-163" title="163">    the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">theme</span>(<span class="dt">axis.text.x=</span><span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb7-164" title="164">  }</a>
+<a class="sourceLine" id="cb7-165" title="165">  </a>
+<a class="sourceLine" id="cb7-166" title="166">  <span class="co"># Label the segments with their number?</span></a>
+<a class="sourceLine" id="cb7-167" title="167">  <span class="cf">if</span> (label.segments) {</a>
+<a class="sourceLine" id="cb7-168" title="168">    segment.labels &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(segment.layout[,<span class="kw">c</span>(<span class="st">&quot;segment&quot;</span>,<span class="st">&quot;x&quot;</span>)])</a>
+<a class="sourceLine" id="cb7-169" title="169">    segment.labels<span class="op">$</span>y &lt;-<span class="st"> </span><span class="kw">apply</span>(object<span class="op">@</span>tree<span class="op">$</span>segment.pseudotime.limits, <span class="dv">1</span>, num.mean)[segment.labels<span class="op">$</span>segment]</a>
+<a class="sourceLine" id="cb7-170" title="170">    the.plot &lt;-<span class="st"> </span>the.plot <span class="op">+</span><span class="st"> </span><span class="kw">geom_label</span>(<span class="dt">data=</span>segment.labels, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y, <span class="dt">label=</span>segment), <span class="dt">alpha=</span><span class="fl">0.5</span>)</a>
+<a class="sourceLine" id="cb7-171" title="171">  }</a>
+<a class="sourceLine" id="cb7-172" title="172">  </a>
+<a class="sourceLine" id="cb7-173" title="173">  <span class="kw">return</span>(the.plot)</a>
+<a class="sourceLine" id="cb7-174" title="174">}</a>
+<a class="sourceLine" id="cb7-175" title="175"></a>
+<a class="sourceLine" id="cb7-176" title="176"></a>
+<a class="sourceLine" id="cb7-177" title="177">output.uniform &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">na.rm=</span>F) {</a>
+<a class="sourceLine" id="cb7-178" title="178">  y &lt;-<span class="st"> </span><span class="kw">unique</span>(<span class="kw">as.character</span>(x))</a>
+<a class="sourceLine" id="cb7-179" title="179">  <span class="cf">if</span> (na.rm) y &lt;-<span class="st"> </span><span class="kw">setdiff</span>(y, <span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb7-180" title="180">  <span class="cf">if</span> (<span class="kw">length</span>(y) <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) <span class="kw">return</span>(y) <span class="cf">else</span> <span class="kw">return</span>(<span class="ot">NA</span>)</a>
+<a class="sourceLine" id="cb7-181" title="181">}</a></code></pre></div>
+<div id="annotation" class="section level2">
+<h2>Annotation</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># celltype_colours = c(# neuronal</span></a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="co">#                     &quot;Embryonic RG&quot; = &quot;#635547&quot;,</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="co">#                     &quot;Juvenile RG &amp; TAPs&quot; = &quot;#DABE99&quot;,</span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="co">#                     &quot;Gliogenic precursors (aNSCs)&quot; = &quot;#8DB5CE&quot;,</span></a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="co">#                     &quot;Gliogenic precursors (APCs)&quot; = &quot;#3F84AA&quot;,</span></a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="co">#                     &quot;Quiescent NSCs [1]&quot; = &quot;#005579&quot;,</span></a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="co">#                     &quot;Quiescent NSCs [2]&quot; = &quot;#C9EBFB&quot;,</span></a>
+<a class="sourceLine" id="cb8-8" title="8"><span class="co">#                     &quot;Early EmNBs [1]&quot; = &quot;#9E6762&quot;,</span></a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="co">#                     &quot;Early EmNBs [2]&quot; = &quot;#9E627B&quot;,</span></a>
+<a class="sourceLine" id="cb8-10" title="10"><span class="co">#                     &quot;GE NBs [1]&quot; = &quot;#C19F70&quot;,</span></a>
+<a class="sourceLine" id="cb8-11" title="11"><span class="co">#                     &quot;GE NBs [2]&quot; = &quot;#139992&quot;,</span></a>
+<a class="sourceLine" id="cb8-12" title="12"><span class="co">#                     &quot;Hippocampal NBs [1]&quot; = &quot;#C594BF&quot;,</span></a>
+<a class="sourceLine" id="cb8-13" title="13"><span class="co">#                     &quot;Hippocampal NBs [2]&quot; = &quot;#0F4A9C&quot;,</span></a>
+<a class="sourceLine" id="cb8-14" title="14"><span class="co">#                     &quot;OPCs&quot; = &quot;#B51D8D&quot;,</span></a>
+<a class="sourceLine" id="cb8-15" title="15"><span class="co">#                     &quot;ImPreMDs&quot; = &quot;#532C8A&quot;,</span></a>
+<a class="sourceLine" id="cb8-16" title="16"><span class="co">#                     &quot;Oligodendrocytes [1]&quot; = &quot;#8870AD&quot;,</span></a>
+<a class="sourceLine" id="cb8-17" title="17"><span class="co">#                     &quot;Oligodendrocytes [2]&quot; = &quot;#CC7818&quot;,</span></a>
+<a class="sourceLine" id="cb8-18" title="18"><span class="co">#                     &quot;Ependymal cells&quot; = &quot;#FBBE92&quot;,</span></a>
+<a class="sourceLine" id="cb8-19" title="19"><span class="co">#                     &quot;GABAergic INs&quot; = &quot;#FACB12&quot;,</span></a>
+<a class="sourceLine" id="cb8-20" title="20"><span class="co">#                     &quot;ImStNeurons&quot; = &quot;#F397C0&quot;)</span></a>
+<a class="sourceLine" id="cb8-21" title="21"></a>
+<a class="sourceLine" id="cb8-22" title="22"></a>
+<a class="sourceLine" id="cb8-23" title="23">celltype_colours =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Embryonic RG&quot;</span> =<span class="st"> &quot;#C72228&quot;</span>,</a>
+<a class="sourceLine" id="cb8-24" title="24">                    <span class="st">&quot;Juvenile RG &amp; TAPs&quot;</span> =<span class="st"> &quot;#FF891C&quot;</span>,</a>
+<a class="sourceLine" id="cb8-25" title="25">                    <span class="st">&quot;Gliogenic precursors (aNSCs)&quot;</span> =<span class="st"> &quot;#FACB12&quot;</span>,</a>
+<a class="sourceLine" id="cb8-26" title="26">                    <span class="st">&quot;Gliogenic precursors (APCs)&quot;</span> =<span class="st"> &quot;#F9DECF&quot;</span>,</a>
+<a class="sourceLine" id="cb8-27" title="27">                    <span class="st">&quot;Ependymal cells&quot;</span> =<span class="st"> &quot;#139992&quot;</span>,</a>
+<a class="sourceLine" id="cb8-28" title="28">                    <span class="st">&quot;Quiescent NSCs [1]&quot;</span> =<span class="st"> &quot;#DABE99&quot;</span>,</a>
+<a class="sourceLine" id="cb8-29" title="29">                    <span class="st">&quot;Quiescent NSCs (dorsal)&quot;</span> =<span class="st"> &quot;#DABE99&quot;</span>,</a>
+<a class="sourceLine" id="cb8-30" title="30">                    <span class="st">&quot;Quiescent NSCs [2]&quot;</span> =<span class="st"> &quot;#DABE99&quot;</span>,</a>
+<a class="sourceLine" id="cb8-31" title="31">                    <span class="st">&quot;Quiescent NSCs (ventral)&quot;</span> =<span class="st"> &quot;#635547&quot;</span>,</a>
+<a class="sourceLine" id="cb8-32" title="32">                    <span class="st">&quot;Early EmNBs [1]&quot;</span> =<span class="st"> &quot;#005579&quot;</span>,</a>
+<a class="sourceLine" id="cb8-33" title="33">                    <span class="st">&quot;Early EmNBs [2]&quot;</span> =<span class="st"> &quot;#8DB5CE&quot;</span>,</a>
+<a class="sourceLine" id="cb8-34" title="34">                    <span class="st">&quot;GABAergic INs&quot;</span> =<span class="st"> &quot;#CDE088&quot;</span>,</a>
+<a class="sourceLine" id="cb8-35" title="35">                    <span class="st">&quot;GE NBs [1]&quot;</span> =<span class="st"> &quot;#3F84AA&quot;</span>,</a>
+<a class="sourceLine" id="cb8-36" title="36">                    <span class="st">&quot;GE NBs [2]&quot;</span> =<span class="st"> &quot;#F7F79E&quot;</span>,</a>
+<a class="sourceLine" id="cb8-37" title="37">                    <span class="st">&quot;ImStNeurons&quot;</span> =<span class="st"> &quot;#B51D8D&quot;</span>,</a>
+<a class="sourceLine" id="cb8-38" title="38">                    <span class="st">&quot;Hippocampal NBs [1]&quot;</span> =<span class="st"> &quot;#C594BF&quot;</span>,</a>
+<a class="sourceLine" id="cb8-39" title="39">                    <span class="st">&quot;Hippocampal NBs [2]&quot;</span> =<span class="st"> &quot;#F397C0&quot;</span>,</a>
+<a class="sourceLine" id="cb8-40" title="40">                    <span class="st">&quot;OPCs&quot;</span> =<span class="st"> &quot;#C9EBFB&quot;</span>,</a>
+<a class="sourceLine" id="cb8-41" title="41">                    <span class="st">&quot;ImPreMDs&quot;</span> =<span class="st"> &quot;#CC7818&quot;</span>,</a>
+<a class="sourceLine" id="cb8-42" title="42">                    <span class="st">&quot;PreM-ODCs&quot;</span> =<span class="st"> &quot;#CC7818&quot;</span>,</a>
+<a class="sourceLine" id="cb8-43" title="43">                    <span class="st">&quot;Oligodendrocytes [1]&quot;</span> =<span class="st"> &quot;#8870AD&quot;</span>,</a>
+<a class="sourceLine" id="cb8-44" title="44">                    <span class="st">&quot;Oligodendrocytes [2]&quot;</span> =<span class="st"> &quot;#532C8A&quot;</span>)</a>
+<a class="sourceLine" id="cb8-45" title="45"></a>
+<a class="sourceLine" id="cb8-46" title="46"></a>
+<a class="sourceLine" id="cb8-47" title="47"><span class="co"># set parameters</span></a>
+<a class="sourceLine" id="cb8-48" title="48">fileID =<span class="st"> &quot;normal_subset_neuronal_glial_cleaned&quot;</span></a>
+<a class="sourceLine" id="cb8-49" title="49">leiden_res =<span class="st"> &#39;leiden_0_4&#39;</span></a>
+<a class="sourceLine" id="cb8-50" title="50">leiden_res_annot =<span class="st"> &#39;annot_leiden_0_4&#39;</span></a>
+<a class="sourceLine" id="cb8-51" title="51"></a>
+<a class="sourceLine" id="cb8-52" title="52">adata_path =<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&#39;data/forebrain_&#39;</span>, fileID, <span class="st">&#39;.h5ad&#39;</span>)</a>
+<a class="sourceLine" id="cb8-53" title="53"></a>
+<a class="sourceLine" id="cb8-54" title="54"><span class="kw">py_run_string</span>(<span class="st">&quot;import numpy as np&quot;</span>)</a>
+<a class="sourceLine" id="cb8-55" title="55"><span class="kw">py_run_string</span>(<span class="st">&quot;import anndata as ad&quot;</span>)</a>
+<a class="sourceLine" id="cb8-56" title="56"></a>
+<a class="sourceLine" id="cb8-57" title="57"><span class="kw">py_run_string</span>(<span class="st">&quot;adata = ad.read_h5ad(r.adata_path)&quot;</span>)</a>
+<a class="sourceLine" id="cb8-58" title="58"></a>
+<a class="sourceLine" id="cb8-59" title="59"></a>
+<a class="sourceLine" id="cb8-60" title="60">metadata_scanpy =<span class="st"> </span><span class="kw">as_tibble</span>(py<span class="op">$</span>adata<span class="op">$</span>obs, <span class="dt">rownames=</span><span class="st">&quot;cellID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-61" title="61"><span class="st">                    </span><span class="kw">rename</span>(<span class="dt">mt_frac =</span> percent_mito) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb8-62" title="62"><span class="st">                    </span><span class="kw">mutate</span>(<span class="dt">UMAP_dim1 =</span> py<span class="op">$</span>adata<span class="op">$</span>obsm[[<span class="st">&#39;X_umap&#39;</span>]][,<span class="dv">1</span>],</a>
+<a class="sourceLine" id="cb8-63" title="63">                           <span class="dt">UMAP_dim2 =</span> py<span class="op">$</span>adata<span class="op">$</span>obsm[[<span class="st">&#39;X_umap&#39;</span>]][,<span class="dv">2</span>])</a>
+<a class="sourceLine" id="cb8-64" title="64"></a>
+<a class="sourceLine" id="cb8-65" title="65">metadata_experiment =<span class="st"> </span><span class="kw">read_tsv</span>(<span class="st">&quot;data/metadata_experiment.tsv&quot;</span>)</a></code></pre></div>
+<pre><code>
+── Column specification ────────────────────────────────────────────────────────
+cols(
+  .default = col_character(),
+  postnatal_day = col_double(),
+  treatment = col_logical(),
+  `Estimated Number of Cells` = col_double(),
+  `Mean Reads per Cell` = col_double(),
+  `Median Genes per Cell` = col_double(),
+  `Number of Reads` = col_double(),
+  `Total Genes Detected` = col_double(),
+  `Median UMI Counts per Cell` = col_double()
+)
+ℹ Use `spec()` for the full column specifications.</code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">results_cyclone =<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/cyclone/cyclone_merged.csv.gz&quot;</span>, <span class="dt">col_types=</span><span class="st">&quot;ccddd&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-2" title="2"><span class="st">                    </span><span class="kw">mutate</span>(<span class="dt">sampleID =</span> <span class="kw">sapply</span>(cellID, <span class="cf">function</span>(cell) <span class="kw">strsplit</span>(cell, <span class="dt">split=</span><span class="st">&quot;-&quot;</span>)[[<span class="dv">1</span>]][<span class="dv">3</span>])) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="st">                    </span><span class="kw">left_join</span>(metadata_experiment, <span class="dt">by=</span><span class="st">&quot;sampleID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="st">                    </span><span class="kw">mutate</span>(<span class="dt">cellID =</span> <span class="kw">gsub</span>(<span class="st">&quot;-1&quot;</span>, <span class="st">&quot;&quot;</span>, cellID)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="st">                    </span><span class="kw">select</span>(cellID, cyclone, cyclone_G1, cyclone_S, cyclone_G2M)</a>
+<a class="sourceLine" id="cb10-6" title="6"></a>
+<a class="sourceLine" id="cb10-7" title="7">results_logreg =<span class="st"> </span><span class="kw">read_csv</span>(<span class="kw">paste0</span>(<span class="st">&quot;data/logreg/logreg_Zeisel_2018_normal.csv.gz&quot;</span>))</a></code></pre></div>
+<pre><code>
+── Column specification ────────────────────────────────────────────────────────
+cols(
+  cellID = col_character(),
+  prediction_Class = col_character(),
+  probability_Class = col_double(),
+  prediction_TaxonomyRank1 = col_character(),
+  probability_TaxonomyRank1 = col_double()
+)</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># filter QC</span></a>
+<a class="sourceLine" id="cb12-2" title="2">metadata =<span class="st"> </span><span class="kw">left_join</span>(metadata_scanpy, results_cyclone, <span class="dt">by=</span><span class="st">&quot;cellID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="st">              </span><span class="kw">mutate</span>(<span class="dt">cyclone =</span> <span class="kw">factor</span>(cyclone, <span class="dt">levels=</span><span class="kw">c</span>(<span class="st">&quot;G1&quot;</span>, <span class="st">&quot;S&quot;</span>, <span class="st">&quot;G2M&quot;</span>))) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="st">              </span><span class="kw">mutate</span>(<span class="dt">timepoint =</span> <span class="kw">factor</span>(timepoint, <span class="dt">levels=</span><span class="kw">unique</span>(timepoint)[<span class="kw">order</span>(<span class="kw">unique</span>(postnatal_day))])) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-5" title="5"><span class="st">              </span><span class="kw">left_join</span>(results_logreg, <span class="dt">by=</span><span class="st">&quot;cellID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-6" title="6"><span class="st">              </span><span class="kw">mutate</span>(<span class="dt">leiden =</span> <span class="kw">get</span>(leiden_res))  <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-7" title="7"><span class="st">              </span><span class="kw">mutate</span>(<span class="dt">gate_gfp =</span> <span class="kw">gsub</span>(<span class="st">&quot;SOX2_-ve&quot;</span>, <span class="st">&quot;GFP-&quot;</span>, gate)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-8" title="8"><span class="st">              </span><span class="kw">mutate</span>(<span class="dt">gate_gfp =</span> <span class="kw">gsub</span>(<span class="st">&quot;SOX2_</span><span class="ch">\\</span><span class="st">+ve&quot;</span>, <span class="st">&quot;GFP+ [SOX2]&quot;</span>, gate_gfp))</a>
+<a class="sourceLine" id="cb12-9" title="9"></a>
+<a class="sourceLine" id="cb12-10" title="10"></a>
+<a class="sourceLine" id="cb12-11" title="11"></a>
+<a class="sourceLine" id="cb12-12" title="12">objectURD.tree<span class="op">@</span>meta<span class="op">$</span>annot_leiden =<span class="st"> </span><span class="kw">left_join</span>(objectURD.tree<span class="op">@</span>meta <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(<span class="op">-</span>annot_leiden), metadata <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(cellID, annot_leiden), <span class="dt">by=</span><span class="st">&quot;cellID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb12-13" title="13"><span class="st">  </span><span class="kw">pull</span>(annot_leiden) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.factor</span>()</a>
+<a class="sourceLine" id="cb12-14" title="14"></a>
+<a class="sourceLine" id="cb12-15" title="15"></a>
+<a class="sourceLine" id="cb12-16" title="16">objectURD.tree<span class="op">@</span>meta<span class="op">$</span>annot_leiden =<span class="st"> </span><span class="kw">factor</span>(objectURD.tree<span class="op">@</span>meta<span class="op">$</span>annot_leiden, <span class="dt">levels =</span> <span class="kw">names</span>(celltype_colours))</a>
+<a class="sourceLine" id="cb12-17" title="17"></a>
+<a class="sourceLine" id="cb12-18" title="18">objectURD.tree &lt;-<span class="st"> </span><span class="kw">nameSegments</span>(objectURD.tree,</a>
+<a class="sourceLine" id="cb12-19" title="19">                               <span class="dt">segments=</span><span class="kw">c</span>(<span class="st">&quot;1&quot;</span>,<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>, <span class="st">&quot;10&quot;</span>, <span class="st">&quot;11&quot;</span>, <span class="st">&quot;12&quot;</span>, <span class="st">&quot;13&quot;</span>),</a>
+<a class="sourceLine" id="cb12-20" title="20">                               <span class="dt">segment.names =</span> <span class="kw">c</span>(<span class="st">&quot;APCs&quot;</span>, <span class="st">&quot;Early EmNBs [1]&quot;</span>, <span class="st">&quot;Early EmNBs [2]&quot;</span>, <span class="st">&quot;Ependymal cells&quot;</span>, <span class="st">&quot;GABAergicINs&quot;</span>, <span class="st">&quot;GE NBs [1]&quot;</span>, <span class="st">&quot;GE NBs [2]&quot;</span>, <span class="st">&quot;Hippocampal NBs [1]&quot;</span>, <span class="st">&quot;Hippocampal NBs [2]&quot;</span>, <span class="st">&quot;ImStNeurons&quot;</span>, <span class="st">&quot;Oligodendrocytes&quot;</span>, <span class="st">&quot;Quiescent NSCs (dorsal)&quot;</span>, <span class="st">&quot;Quiescent NSCs (ventral)&quot;</span>))</a>
+<a class="sourceLine" id="cb12-21" title="21"></a>
+<a class="sourceLine" id="cb12-22" title="22"></a>
+<a class="sourceLine" id="cb12-23" title="23">plt_tree_annot =<span class="st"> </span><span class="kw">plotTree_adjusted</span>(objectURD.tree, <span class="st">&quot;annot_leiden&quot;</span>, <span class="dt">discrete.colors=</span>celltype_colours, <span class="dt">title=</span><span class="st">&quot;&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-24" title="24"><span class="st">                      </span>theme_publication <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-25" title="25"><span class="st">                      </span><span class="kw">guides</span>(<span class="dt">x =</span>  <span class="kw">guide_axis</span>(<span class="dt">angle =</span> <span class="dv">45</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb12-26" title="26"><span class="st">                      </span><span class="kw">theme</span>(<span class="dt">plot.margin =</span> <span class="kw">margin</span>(<span class="dt">t=</span><span class="fl">5.5</span>, <span class="dt">r=</span><span class="fl">5.5</span>, <span class="dt">b=</span><span class="fl">5.5</span>, <span class="dt">l=</span><span class="fl">20.5</span>, <span class="dt">unit=</span><span class="st">&quot;pt&quot;</span>))</a>
+<a class="sourceLine" id="cb12-27" title="27"></a>
+<a class="sourceLine" id="cb12-28" title="28">plt_tree_annot</a></code></pre></div>
+<p><img src="figure/figure_neuronal_glial_lineage_tree.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">results_logreg =<span class="st"> </span><span class="kw">read_csv</span>(<span class="kw">paste0</span>(<span class="st">&quot;data/logreg/logreg_Zeisel_2018_normal.csv.gz&quot;</span>))</a></code></pre></div>
+<pre><code>
+── Column specification ────────────────────────────────────────────────────────
+cols(
+  cellID = col_character(),
+  prediction_Class = col_character(),
+  probability_Class = col_double(),
+  prediction_TaxonomyRank1 = col_character(),
+  probability_TaxonomyRank1 = col_double()
+)</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" title="1">objectURD.tree<span class="op">@</span>meta<span class="op">$</span>prediction_TaxonomyRank1 =<span class="st"> </span><span class="kw">left_join</span>(objectURD.tree<span class="op">@</span>meta, results_logreg, <span class="dt">by=</span><span class="st">&quot;cellID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb15-2" title="2"><span class="st">  </span><span class="kw">pull</span>(prediction_TaxonomyRank1) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.factor</span>()</a>
+<a class="sourceLine" id="cb15-3" title="3"></a>
+<a class="sourceLine" id="cb15-4" title="4"></a>
+<a class="sourceLine" id="cb15-5" title="5">  </a>
+<a class="sourceLine" id="cb15-6" title="6">celltype_colours =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Glia&quot;</span> =<span class="st"> &quot;#f8766d&quot;</span>,</a>
+<a class="sourceLine" id="cb15-7" title="7">                     <span class="st">&quot;Immune cells&quot;</span> =<span class="st"> &quot;#7cae00&quot;</span>,</a>
+<a class="sourceLine" id="cb15-8" title="8">                     <span class="st">&quot;Neurons&quot;</span> =<span class="st"> &quot;#00bfc4&quot;</span>)</a>
+<a class="sourceLine" id="cb15-9" title="9"><span class="co"># #c77cff</span></a>
+<a class="sourceLine" id="cb15-10" title="10"></a>
+<a class="sourceLine" id="cb15-11" title="11">plt_tree_annot_zeisel =<span class="st"> </span><span class="kw">plotTree_adjusted</span>(objectURD.tree, <span class="st">&quot;prediction_TaxonomyRank1&quot;</span>, <span class="dt">discrete.colors=</span>celltype_colours, <span class="dt">cell.size=</span><span class="fl">0.1</span>, <span class="dt">title=</span><span class="st">&quot;&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb15-12" title="12"><span class="st">                      </span>theme_publication <span class="op">+</span></a>
+<a class="sourceLine" id="cb15-13" title="13"><span class="st">                      </span><span class="kw">guides</span>(<span class="dt">x =</span>  <span class="kw">guide_axis</span>(<span class="dt">angle =</span> <span class="dv">45</span>))</a>
+<a class="sourceLine" id="cb15-14" title="14"></a>
+<a class="sourceLine" id="cb15-15" title="15"></a>
+<a class="sourceLine" id="cb15-16" title="16"><span class="co"># </span></a>
+<a class="sourceLine" id="cb15-17" title="17"><span class="co"># # plt_tree_annot = plotTree_adjusted(objectURD.tree, &quot;prediction_TaxonomyRank1&quot;, title=&quot;&quot;) +</span></a>
+<a class="sourceLine" id="cb15-18" title="18"><span class="co"># #                       theme_publication +</span></a>
+<a class="sourceLine" id="cb15-19" title="19"><span class="co"># #                       guides(x =  guide_axis(angle = 45))</span></a>
+<a class="sourceLine" id="cb15-20" title="20"><span class="co"># </span></a>
+<a class="sourceLine" id="cb15-21" title="21"><span class="co"># </span></a>
+<a class="sourceLine" id="cb15-22" title="22"></a>
+<a class="sourceLine" id="cb15-23" title="23">plt_tree_annot_zeisel</a></code></pre></div>
+<p><img src="figure/figure_neuronal_glial_lineage_tree.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">colour_map =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;E12.5&quot;</span>=<span class="st">&quot;#fdcc8a&quot;</span>,</a>
+<a class="sourceLine" id="cb16-2" title="2">              <span class="st">&quot;E14.5&quot;</span>=<span class="st">&quot;#fc8d59&quot;</span>,</a>
+<a class="sourceLine" id="cb16-3" title="3">              <span class="st">&quot;E16.5&quot;</span>=<span class="st">&quot;#d7301f&quot;</span>,</a>
+<a class="sourceLine" id="cb16-4" title="4">              <span class="st">&quot;P0&quot;</span>=<span class="st">&quot;#bdc9e1&quot;</span>,</a>
+<a class="sourceLine" id="cb16-5" title="5">              <span class="st">&quot;P2&quot;</span>=<span class="st">&quot;#74a9cf&quot;</span>,</a>
+<a class="sourceLine" id="cb16-6" title="6">              <span class="st">&quot;P7&quot;</span>=<span class="st">&quot;#0570b0&quot;</span>,</a>
+<a class="sourceLine" id="cb16-7" title="7">              <span class="st">&quot;P13&quot;</span>=<span class="st">&quot;#d9d9d9&quot;</span>,</a>
+<a class="sourceLine" id="cb16-8" title="8">              <span class="st">&quot;P19&quot;</span>=<span class="st">&quot;#bdbdbd&quot;</span>,</a>
+<a class="sourceLine" id="cb16-9" title="9">              <span class="st">&quot;P39&quot;</span>=<span class="st">&quot;#969696&quot;</span>,</a>
+<a class="sourceLine" id="cb16-10" title="10">              <span class="st">&quot;P111&quot;</span>=<span class="st">&quot;#636363&quot;</span>,</a>
+<a class="sourceLine" id="cb16-11" title="11">              <span class="st">&quot;P365&quot;</span>=<span class="st">&quot;#252525&quot;</span>)</a>
+<a class="sourceLine" id="cb16-12" title="12"></a>
+<a class="sourceLine" id="cb16-13" title="13">objectURD.tree<span class="op">@</span>meta<span class="op">$</span>timepoint =<span class="st"> </span><span class="kw">factor</span>(objectURD.tree<span class="op">@</span>meta<span class="op">$</span>timepoint, <span class="dt">levels =</span> <span class="kw">names</span>(colour_map))</a>
+<a class="sourceLine" id="cb16-14" title="14"></a>
+<a class="sourceLine" id="cb16-15" title="15">plt_tree_timepoint =<span class="st"> </span><span class="kw">plotTree_adjusted</span>(objectURD.tree, <span class="st">&quot;timepoint&quot;</span>, <span class="dt">discrete.colors=</span>colour_map, <span class="dt">title=</span><span class="st">&quot;&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb16-16" title="16"><span class="st">                      </span>theme_publication <span class="op">+</span></a>
+<a class="sourceLine" id="cb16-17" title="17"><span class="st">                      </span><span class="kw">theme</span>(<span class="dt">axis.text.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb16-18" title="18">                            <span class="dt">axis.ticks.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb16-19" title="19">                            <span class="dt">axis.text.y=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb16-20" title="20">                            <span class="dt">axis.ticks.y=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb16-21" title="21">                            <span class="dt">axis.title.x =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb16-22" title="22">                            <span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb16-23" title="23">                            <span class="dt">panel.border =</span> <span class="kw">element_blank</span>())</a>
+<a class="sourceLine" id="cb16-24" title="24"></a>
+<a class="sourceLine" id="cb16-25" title="25">plt_tree_timepoint</a></code></pre></div>
+<p><img src="figure/figure_neuronal_glial_lineage_tree.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="co"># panel_tree = plt_tree_annot + plt_tree_timepoint</span></a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="co"># panel_tree</span></a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">plt_tree_expr_Sox2 =<span class="st"> </span><span class="kw">plotTree_adjusted</span>(objectURD.tree, <span class="st">&quot;Sox2&quot;</span>, <span class="dt">cell.size=</span><span class="fl">0.1</span>, <span class="dt">title=</span><span class="st">&quot;&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-2" title="2"><span class="st">                      </span>theme_publication <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="st">                      </span><span class="kw">scale_colour_viridis</span>(<span class="dt">option=</span><span class="st">&quot;magma&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-4" title="4"><span class="st">                      </span><span class="co"># scale_colour_viridis() +</span></a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="st">                      </span><span class="co"># scale_fill_viridis() +</span></a>
+<a class="sourceLine" id="cb18-6" title="6"><span class="st">                      </span><span class="co"># guides(x =  guide_axis(angle = 45)) +</span></a>
+<a class="sourceLine" id="cb18-7" title="7"><span class="st">                      </span><span class="kw">theme</span>(<span class="dt">axis.text.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb18-8" title="8">                            <span class="dt">axis.ticks.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb18-9" title="9">                            <span class="dt">axis.text.y=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb18-10" title="10">                            <span class="dt">axis.ticks.y=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb18-11" title="11">                            <span class="dt">axis.title.x =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb18-12" title="12">                            <span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb18-13" title="13">                            <span class="dt">panel.border =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-14" title="14"><span class="st">                      </span><span class="kw">guides</span>(<span class="dt">colour =</span> <span class="kw">guide_colorbar</span>(<span class="dt">barwidth =</span> <span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb18-15" title="15">                                                   <span class="dt">barheight =</span> <span class="dv">2</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb18-16" title="16"><span class="st">                      </span><span class="kw">labs</span>(<span class="dt">colour =</span> <span class="st">&quot;Sox2 [log1p]&quot;</span>)</a></code></pre></div>
+<pre><code>Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+which will replace the existing scale.</code></pre>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">plt_tree_expr_Sox2</a></code></pre></div>
+<p><img src="figure/figure_neuronal_glial_lineage_tree.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">plt_tree_expr_Sox2_rescaled =<span class="st"> </span>plt_tree_expr_Sox2 <span class="op">+</span><span class="st"> </span><span class="kw">scale_colour_viridis</span>(<span class="dt">option=</span><span class="st">&quot;magma&quot;</span>, <span class="dt">rescaler =</span> <span class="cf">function</span>(x, <span class="dt">from =</span> <span class="ot">NULL</span>) {</a>
+<a class="sourceLine" id="cb21-2" title="2">  <span class="kw">ifelse</span>(x<span class="op">&lt;</span><span class="dv">2</span>, </a>
+<a class="sourceLine" id="cb21-3" title="3">         scales<span class="op">::</span><span class="kw">rescale</span>(x,</a>
+<a class="sourceLine" id="cb21-4" title="4">                         <span class="dt">to =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>),</a>
+<a class="sourceLine" id="cb21-5" title="5">                         <span class="dt">from =</span> <span class="kw">c</span>(<span class="kw">min</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dv">2</span>)),</a>
+<a class="sourceLine" id="cb21-6" title="6">         scales<span class="op">::</span><span class="kw">rescale</span>(x,</a>
+<a class="sourceLine" id="cb21-7" title="7">                         <span class="dt">to =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb21-8" title="8">                         <span class="dt">from =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="kw">max</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))))}) <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-9" title="9"><span class="st">         </span><span class="kw">guides</span>(<span class="dt">colour =</span> <span class="kw">guide_colorbar</span>(<span class="dt">barwidth =</span> <span class="fl">0.3</span>,</a>
+<a class="sourceLine" id="cb21-10" title="10">                                      <span class="dt">barheight =</span> <span class="dv">2</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb21-11" title="11"><span class="st">         </span><span class="kw">labs</span>(<span class="dt">colour =</span> <span class="st">&quot;Sox2 [log1p]&quot;</span>) <span class="op">+</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb21-12" title="12"><span class="st">         </span><span class="kw">scale_fill_viridis</span>(<span class="dt">option=</span><span class="st">&quot;magma&quot;</span>, <span class="dt">rescaler =</span> <span class="cf">function</span>(x, <span class="dt">from =</span> <span class="ot">NULL</span>) {</a>
+<a class="sourceLine" id="cb21-13" title="13">           <span class="kw">ifelse</span>(x<span class="op">&lt;</span><span class="dv">2</span>, </a>
+<a class="sourceLine" id="cb21-14" title="14">                  scales<span class="op">::</span><span class="kw">rescale</span>(x,</a>
+<a class="sourceLine" id="cb21-15" title="15">                                  <span class="dt">to =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>),</a>
+<a class="sourceLine" id="cb21-16" title="16">                                  <span class="dt">from =</span> <span class="kw">c</span>(<span class="kw">min</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>), <span class="dv">2</span>)),</a>
+<a class="sourceLine" id="cb21-17" title="17">                  scales<span class="op">::</span><span class="kw">rescale</span>(x,</a>
+<a class="sourceLine" id="cb21-18" title="18">                                  <span class="dt">to =</span> <span class="kw">c</span>(<span class="fl">0.5</span>, <span class="dv">1</span>),</a>
+<a class="sourceLine" id="cb21-19" title="19">                                  <span class="dt">from =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="kw">max</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))))})</a></code></pre></div>
+<pre><code>Scale for &#39;colour&#39; is already present. Adding another scale for &#39;colour&#39;,
+which will replace the existing scale.</code></pre>
+</div>
+<div id="gfp-expression" class="section level2">
+<h2>GFP expression</h2>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">objectURD.tree<span class="op">@</span>meta<span class="op">$</span>gate_gfp =<span class="st"> </span><span class="kw">left_join</span>(objectURD.tree<span class="op">@</span>meta, metadata <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(cellID, gate_gfp), <span class="dt">by=</span><span class="st">&quot;cellID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="kw">pull</span>(gate_gfp) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.factor</span>()</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1">plt_tree_GFP =<span class="st"> </span><span class="kw">plotTree_adjusted</span>(objectURD.tree, <span class="st">&quot;gate_gfp&quot;</span>, <span class="dt">cell.size=</span><span class="fl">0.1</span>, <span class="dt">title=</span><span class="st">&quot;&quot;</span>) <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-2" title="2"><span class="st">                      </span>theme_publication <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-3" title="3"><span class="st">                      </span><span class="kw">scale_colour_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&quot;GFP-&quot;</span>=<span class="st">&quot;#CCCCCC&quot;</span>, <span class="st">&quot;GFP+ [SOX2]&quot;</span>=<span class="st">&quot;#65A83E&quot;</span>)) <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-4" title="4"><span class="st">                      </span><span class="co"># scale_colour_viridis(option=&quot;magma&quot;) +</span></a>
+<a class="sourceLine" id="cb24-5" title="5"><span class="st">                      </span><span class="co"># scale_colour_viridis() +</span></a>
+<a class="sourceLine" id="cb24-6" title="6"><span class="st">                      </span><span class="co"># scale_fill_viridis() +</span></a>
+<a class="sourceLine" id="cb24-7" title="7"><span class="st">                      </span><span class="co"># guides(x =  guide_axis(angle = 45)) +</span></a>
+<a class="sourceLine" id="cb24-8" title="8"><span class="st">                      </span><span class="kw">theme</span>(<span class="dt">axis.text.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb24-9" title="9">                            <span class="dt">axis.ticks.x=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb24-10" title="10">                            <span class="dt">axis.text.y=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb24-11" title="11">                            <span class="dt">axis.ticks.y=</span><span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb24-12" title="12">                            <span class="dt">axis.title.x =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb24-13" title="13">                            <span class="dt">axis.title.y =</span> <span class="kw">element_blank</span>(),</a>
+<a class="sourceLine" id="cb24-14" title="14">                            <span class="dt">panel.border =</span> <span class="kw">element_blank</span>()) <span class="op">+</span></a>
+<a class="sourceLine" id="cb24-15" title="15"><span class="st">                      </span><span class="kw">labs</span>(<span class="dt">colour =</span> <span class="st">&quot;FACS gate&quot;</span>)</a>
+<a class="sourceLine" id="cb24-16" title="16"></a>
+<a class="sourceLine" id="cb24-17" title="17">plt_tree_GFP</a></code></pre></div>
+<p><img src="figure/figure_neuronal_glial_lineage_tree.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="export-figures" class="section level1">
+<h1>Export figures</h1>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="co"># ggsave(&quot;figures/figure_ependymal_cells/UMAP_annot_ependymal_cells.pdf&quot;, plot=plt_UMAP_annot_ependymal, height=5, width=8.15, units=&quot;cm&quot;)</span></a>
+<a class="sourceLine" id="cb25-2" title="2"><span class="co"># ggsave(&quot;figures/figure_ependymal_cells/UMAP_timepoints_ependymal_cells.pdf&quot;, plot=plt_UMAP_day, height=5, width=9.15, units=&quot;cm&quot;)</span></a>
+<a class="sourceLine" id="cb25-3" title="3"></a>
+<a class="sourceLine" id="cb25-4" title="4"><span class="co"># annotation</span></a>
+<a class="sourceLine" id="cb25-5" title="5"><span class="kw">ggsave</span>(<span class="st">&quot;figures/figure_neuronal_glial_lineage_tree/URD_tree_annot_neuronal_glial.pdf&quot;</span>, <span class="dt">plot=</span>plt_tree_annot, <span class="dt">height=</span><span class="dv">8</span>, <span class="dt">width=</span><span class="fl">12.15</span>, <span class="dt">units=</span><span class="st">&quot;cm&quot;</span>)</a>
+<a class="sourceLine" id="cb25-6" title="6"></a>
+<a class="sourceLine" id="cb25-7" title="7"></a>
+<a class="sourceLine" id="cb25-8" title="8"><span class="co"># annot Zeisel</span></a>
+<a class="sourceLine" id="cb25-9" title="9"><span class="kw">ggsave</span>(<span class="st">&quot;figures/figure_neuronal_glial_lineage_tree/URD_tree_annot_Zeisel_neuronal_glial.pdf&quot;</span>, <span class="dt">plot=</span>plt_tree_annot_zeisel, <span class="dt">height=</span><span class="dv">8</span>, <span class="dt">width=</span><span class="fl">12.15</span>, <span class="dt">units=</span><span class="st">&quot;cm&quot;</span>)</a>
+<a class="sourceLine" id="cb25-10" title="10"></a>
+<a class="sourceLine" id="cb25-11" title="11"></a>
+<a class="sourceLine" id="cb25-12" title="12"><span class="co"># timepoints</span></a>
+<a class="sourceLine" id="cb25-13" title="13"><span class="kw">ggsave</span>(<span class="st">&quot;figures/figure_neuronal_glial_lineage_tree/URD_tree_timepoint_neuronal_glial.pdf&quot;</span>, <span class="dt">plot=</span>plt_tree_timepoint, <span class="dt">height=</span><span class="dv">4</span>, <span class="dt">width=</span><span class="dv">6</span>, <span class="dt">units=</span><span class="st">&quot;cm&quot;</span>)</a>
+<a class="sourceLine" id="cb25-14" title="14"></a>
+<a class="sourceLine" id="cb25-15" title="15"></a>
+<a class="sourceLine" id="cb25-16" title="16"><span class="co"># gene expr</span></a>
+<a class="sourceLine" id="cb25-17" title="17"><span class="kw">ggsave</span>(<span class="st">&quot;figures/figure_neuronal_glial_lineage_tree/URD_tree_expr_Sox2_neuronal_glial.pdf&quot;</span>, <span class="dt">plot=</span>plt_tree_expr_Sox2, <span class="dt">height=</span><span class="dv">4</span>, <span class="dt">width=</span><span class="dv">6</span>, <span class="dt">units=</span><span class="st">&quot;cm&quot;</span>)</a>
+<a class="sourceLine" id="cb25-18" title="18"><span class="kw">ggsave</span>(<span class="st">&quot;figures/figure_neuronal_glial_lineage_tree/URD_tree_expr_Sox2_rescaled_neuronal_glial.pdf&quot;</span>, <span class="dt">plot=</span>plt_tree_expr_Sox2_rescaled, <span class="dt">height=</span><span class="dv">4</span>, <span class="dt">width=</span><span class="dv">6</span>, <span class="dt">units=</span><span class="st">&quot;cm&quot;</span>)</a>
+<a class="sourceLine" id="cb25-19" title="19"></a>
+<a class="sourceLine" id="cb25-20" title="20"></a>
+<a class="sourceLine" id="cb25-21" title="21"><span class="kw">ggsave</span>(<span class="st">&quot;figures/figure_neuronal_glial_lineage_tree/URD_tree_GFP_neuronal_glial.pdf&quot;</span>, <span class="dt">plot=</span>plt_tree_GFP, <span class="dt">height=</span><span class="dv">4</span>, <span class="dt">width=</span><span class="dv">6</span>, <span class="dt">units=</span><span class="st">&quot;cm&quot;</span>)</a>
+<a class="sourceLine" id="cb25-22" title="22"></a>
+<a class="sourceLine" id="cb25-23" title="23"></a>
+<a class="sourceLine" id="cb25-24" title="24"></a>
+<a class="sourceLine" id="cb25-25" title="25"><span class="kw">ggsave</span>(<span class="st">&quot;figures/figure_neuronal_glial_lineage_tree/URD_tree_panel_neuronal_glial.pdf&quot;</span>, <span class="dt">plot=</span>plt_tree_annot <span class="op">+</span><span class="st"> </span><span class="kw">wrap_elements</span>(<span class="dt">full =</span> plt_tree_timepoint <span class="op">/</span><span class="st"> </span>plt_tree_expr_Sox2_rescaled), <span class="dt">height=</span><span class="fl">8.5</span>, <span class="dt">width=</span><span class="fl">18.3</span>, <span class="dt">units=</span><span class="st">&quot;cm&quot;</span>)</a></code></pre></div>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="kw">sessionInfo</span>()</a></code></pre></div>
+<pre><code>R version 4.0.3 (2020-10-10)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+
+locale:
+ [1] LC_CTYPE=en_GB.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_GB.UTF-8    
+ [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_GB.UTF-8   
+ [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] URD_1.1.1         Matrix_1.3-2      ggthemes_4.2.4    reshape2_1.4.4   
+ [5] reticulate_1.18   kableExtra_1.3.4  knitr_1.31        ggrastr_0.2.3    
+ [9] ggrepel_0.9.1     tibble_3.1.0      dplyr_1.0.4       readr_1.4.0      
+[13] patchwork_1.1.1   viridis_0.5.1     viridisLite_0.3.0 ggplot2_3.3.3    
+[17] workflowr_1.6.2  
+
+loaded via a namespace (and not attached):
+  [1] readxl_1.3.1                systemfonts_1.0.1          
+  [3] RcppEigen_0.3.3.9.1         igraph_1.2.6               
+  [5] plyr_1.8.6                  sp_1.4-5                   
+  [7] RcppHNSW_0.3.0              GenomeInfoDb_1.24.2        
+  [9] digest_0.6.27               htmltools_0.5.1.1          
+ [11] gdata_2.18.0                fansi_0.4.2                
+ [13] magrittr_2.0.1              ROCR_1.0-11                
+ [15] openxlsx_4.2.3              graphlayouts_0.7.1         
+ [17] gmodels_2.18.1              matrixStats_0.58.0         
+ [19] xts_0.12.1                  svglite_2.0.0              
+ [21] colorspace_2.0-0            rappdirs_0.3.3             
+ [23] rvest_0.3.6                 haven_2.3.1                
+ [25] xfun_0.21                   crayon_1.4.1               
+ [27] RCurl_1.98-1.2              jsonlite_1.7.2             
+ [29] hexbin_1.28.2               zoo_1.8-8                  
+ [31] glue_1.4.2                  polyclip_1.10-0            
+ [33] gtable_0.3.0                zlibbioc_1.34.0            
+ [35] XVector_0.28.0              webshot_0.5.2              
+ [37] DelayedArray_0.14.1         car_3.0-10                 
+ [39] SingleCellExperiment_1.10.1 BiocGenerics_0.34.0        
+ [41] DEoptimR_1.0-8              abind_1.4-5                
+ [43] VIM_6.1.0                   scales_1.1.1               
+ [45] ggplot.multistats_1.0.0     DBI_1.1.1                  
+ [47] Rcpp_1.0.6                  laeken_0.5.1               
+ [49] foreign_0.8-81              proxy_0.4-24               
+ [51] stats4_4.0.3                vcd_1.4-8                  
+ [53] httr_1.4.2                  gplots_3.1.1               
+ [55] RColorBrewer_1.1-2          ellipsis_0.3.1             
+ [57] farver_2.1.0                pkgconfig_2.0.3            
+ [59] nnet_7.3-15                 sass_0.3.1                 
+ [61] utf8_1.1.4                  labeling_0.4.2             
+ [63] tidyselect_1.1.0            rlang_0.4.10               
+ [65] later_1.1.0.1               munsell_0.5.0              
+ [67] cellranger_1.1.0            tools_4.0.3                
+ [69] cli_2.3.1                   generics_0.1.0             
+ [71] ranger_0.12.1               evaluate_0.14              
+ [73] stringr_1.4.0               yaml_2.2.1                 
+ [75] fs_1.5.0                    tidygraph_1.2.0            
+ [77] zip_2.1.1                   robustbase_0.93-7          
+ [79] caTools_1.18.1              purrr_0.3.4                
+ [81] RANN_2.6.1                  ggraph_2.0.5               
+ [83] xml2_1.3.2                  compiler_4.0.3             
+ [85] rstudioapi_0.13             beeswarm_0.2.3             
+ [87] curl_4.3                    e1071_1.7-4                
+ [89] tweenr_1.0.1                smoother_1.1               
+ [91] bslib_0.2.4                 stringi_1.5.3              
+ [93] highr_0.8                   ps_1.6.0                   
+ [95] RSpectra_0.16-0             forcats_0.5.1              
+ [97] lattice_0.20-41             vctrs_0.3.6                
+ [99] pillar_1.5.0                lifecycle_1.0.0            
+[101] lmtest_0.9-38               jquerylib_0.1.3            
+[103] data.table_1.14.0           bitops_1.0-6               
+[105] irlba_2.3.3                 httpuv_1.5.5               
+[107] GenomicRanges_1.40.0        R6_2.5.0                   
+[109] pcaMethods_1.80.0           promises_1.2.0.1           
+[111] KernSmooth_2.23-18          gridExtra_2.3              
+[113] rio_0.5.26                  vipor_0.4.5                
+[115] IRanges_2.22.2              codetools_0.2-18           
+[117] boot_1.3-27                 MASS_7.3-53.1              
+[119] gtools_3.8.2                assertthat_0.2.1           
+[121] destiny_3.2.0               SummarizedExperiment_1.18.2
+[123] rprojroot_2.0.2             minpack.lm_1.2-1           
+[125] withr_2.4.1                 S4Vectors_0.26.1           
+[127] GenomeInfoDbData_1.2.3      diptest_0.75-7             
+[129] parallel_4.0.3              hms_1.0.0                  
+[131] grid_4.0.3                  tidyr_1.1.2                
+[133] class_7.3-18                rmarkdown_2.7              
+[135] carData_3.0-4               Cairo_1.5-12.2             
+[137] Rtsne_0.15                  git2r_0.28.0               
+[139] TTR_0.24.2                  ggforce_0.3.2              
+[141] scatterplot3d_0.3-41        Biobase_2.48.0             
+[143] ggbeeswarm_0.6.0           </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

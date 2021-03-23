@@ -1,0 +1,394 @@
+---
+title: "Figure - Neuronal & glial subset"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+Overview of the developmental data-set.
+
+
+```{r setup, message=FALSE, warning=TRUE}
+knitr::opts_chunk$set(autodep = TRUE)
+library(ggplot2)
+library(viridis)
+library(patchwork)
+library(ggrepel)
+ 
+library(readr)
+library(dplyr)
+library(tibble)
+
+library(knitr)
+library(kableExtra)
+
+library(reticulate)
+
+source("code/core_settings.R")
+source("code/core_functions.R")
+```
+
+```{r}
+# set parameters
+fileID = "normal_subset_neuronal_glial_cleaned"
+leiden_res = 'leiden_0_4'
+leiden_res_annot = 'annot_leiden'
+
+adata_path = paste0('data/forebrain_', fileID, '.h5ad')
+
+# annot_order = c("Juvenile ependymal cells [cycling]",
+#                 "Juvenile ependymal cells",
+#                 "Adult ependymal cells")
+# 
+# colour_map = c("Juvenile ependymal cells [cycling]" = "#005579",
+#                 "Juvenile ependymal cells" = "#C9EBFB",
+#                 "Adult ependymal cells" = "#FBBE92")
+# 
+celltype_colours = neuronal_glial_colours
+colour_celltypes = neuronal_glial_colours
+annot_order = names(neuronal_glial_colours)
+```
+
+```{r}
+#repl_python()
+py_run_string("import numpy as np")
+py_run_string("import anndata as ad")
+
+py_run_string("adata = ad.read_h5ad(r.adata_path)")
+```
+
+
+```{r, message=FALSE, warning=TRUE}
+metadata_scanpy = as_tibble(py$adata$obs, rownames="cellID") %>%
+                    rename(mt_frac = percent_mito) %>%
+                    mutate(UMAP_dim1 = py$adata$obsm[['X_umap']][,1],
+                           UMAP_dim2 = py$adata$obsm[['X_umap']][,2])
+
+metadata_experiment = read_tsv("data/metadata_experiment.tsv")
+results_cyclone = read_csv("data/cyclone/cyclone_merged.csv.gz", col_types="ccddd") %>%
+                    mutate(sampleID = sapply(cellID, function(cell) strsplit(cell, split="-")[[1]][3])) %>%
+                    left_join(metadata_experiment, by="sampleID") %>%
+                    mutate(cellID = gsub("-1", "", cellID)) %>%
+                    select(cellID, cyclone, cyclone_G1, cyclone_S, cyclone_G2M)
+
+results_logreg = read_csv(paste0("data/logreg/logreg_Zeisel_2018_normal.csv.gz"))
+
+
+# filter QC
+metadata = left_join(metadata_scanpy, results_cyclone, by="cellID") %>%
+              mutate(cyclone = factor(cyclone, levels=c("G1", "S", "G2M"))) %>%
+              mutate(timepoint = factor(timepoint, levels=unique(timepoint)[order(unique(postnatal_day))])) %>%
+              left_join(results_logreg, by="cellID") %>%
+              mutate(leiden = get(leiden_res))
+```
+
+```{r}
+metadata = metadata %>%
+            mutate(prediction_TaxonomyRank1 = gsub("Neurons", "Neuronal", prediction_TaxonomyRank1)) %>%
+            mutate(prediction_TaxonomyRank1 = gsub("^Glia$", "Glial", prediction_TaxonomyRank1)) %>%
+            mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+            mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp)) %>%
+            mutate(annot_leiden = plyr::revalue(annot_leiden, c("[unclear/debris]" = NA)))
+```
+
+
+
+# Timepoints
+
+
+```{r}
+library(ggrastr)
+                            
+plt_UMAP_day = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=timepoint)) +
+                            # geom_point(size=0.05, alpha=0.8, shape=16) +
+                            geom_point_rast(size=0.05, alpha=0.8, shape=16, raster.dpi=300) +
+                            # scale_colour_viridis(discrete=T) +
+                            scale_color_manual(values=colour_timepoints) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Time point") +
+                            guides(colour = guide_legend(override.aes = list(size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+```
+
+```{r}
+plt_UMAP_day
+```
+
+# Logreg & RNA velocity
+
+
+```{r}
+# library(png)
+# library(grid)
+# 
+# 
+# tbl_annot_coarse_empty = tibble(annot_coarse = factor(names(colour_timepoints)[3:11], levels=names(colour_timepoints)[3:11]),
+#                                 UMAP_dim1 = c(0, 1, 0, 1, 1, 1, 0, 1, 1),
+#                                 UMAP_dim2 = c(0, 1, 0, 1, 1, 1, 0, 1, 0))
+# 
+# plt_UMAP_empty = ggplot(tbl_annot_coarse_empty, aes(x=UMAP_dim1, y=UMAP_dim2, colour=annot_coarse)) +
+#                             # geom_blank() +
+#                             geom_point(shape=16, alpha=0) +
+#                             scale_color_manual(values=c(colour_timepoints[3:11]), drop=FALSE) +
+#                             theme_publication +
+#                             labs(x="UMAP 1", y="UMAP 2") +
+#                             theme(axis.text.x=element_blank(),
+#                                   axis.ticks.x=element_blank(),
+#                                   axis.text.y=element_blank(),
+#                                   axis.ticks.y=element_blank()) +
+#                             labs(colour="Time point") +
+#                             guides(colour = guide_legend(override.aes = list(alpha=1, size=2),
+#                                                          keyheight=0.3,
+#                                                          default.unit="cm"))
+# 
+# 
+# 
+# img_velo = readPNG("figures/figure_ependymal_cells/scvelo/scvelo_stochastic_normal_subset_ependymal_cleaned_timepoint_dpi_600_no_legend.png")
+# g_velo = rasterGrob(img_velo, interpolate=TRUE)
+# 
+# plt_velocyto = plt_UMAP_empty +
+#                   annotation_custom(g_velo, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf)
+```
+
+```{r}
+# plt_velocyto
+```
+
+
+# Cluster annotation
+
+
+```{r}
+library(ggrepel)
+library(ggthemes)
+library(ggrastr)
+
+plot_UMAP_leiden <- function(leiden_key){
+  
+  metadata = metadata %>%
+              mutate(leiden = get(leiden_key))
+              
+  cl_cent = metadata %>%
+                  select(UMAP_dim1, UMAP_dim2, leiden) %>%
+                  group_by(leiden) %>%
+                  summarize_all(mean)
+  
+  # randomise order for plot
+  plt_UMAP_leiden = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=leiden)) +
+                              # geom_point(size=0.2, alpha=0.8, shape=16) +
+                              geom_point_rast(size=0.2, stroke=0, alpha=0.8, shape=16, raster.dpi=600) +
+                              # geom_point_rast(size=0.2, alpha=0.8, shape=16, raster.dpi=600) +
+                              geom_label_repel(aes(x=UMAP_dim1, y=UMAP_dim2, label=leiden),
+                                      fill='white', colour='black', label.size=NA,
+                                      alpha=0.9, label.padding = 0.1, point.padding = 0,
+                                      data=cl_cent, size=1.78, show.legend=FALSE, inherit.aes=F) +
+                              scale_colour_manual(values=celltype_colours) +
+                              theme_publication +
+                              labs(x="UMAP 1", y="UMAP 2") +
+                              theme(axis.text.x=element_blank(),
+                                    axis.ticks.x=element_blank(),
+                                    axis.text.y=element_blank(),
+                                    axis.ticks.y=element_blank()) +
+                              # guides(color = guide_legend(override.aes = list(size=3))) +
+                              # labs(colour="Leiden")
+                              # labs(title=paste0(leiden_key)) +
+                              theme(legend.position="none")
+
+  return(plt_UMAP_leiden)
+}
+```
+
+```{r}
+plt_UMAP_annot_neuronal_glial = plot_UMAP_leiden("annot_leiden")
+plt_UMAP_annot_neuronal_glial
+```
+
+
+# Distribution of logreg probabilities
+
+```{r}
+plt_hist = ggplot(metadata, aes(probability_TaxonomyRank1)) +
+# geom_bar(stat="identity", position="dodge") +
+                geom_histogram() +
+                theme_publication
+
+plt_hist
+```
+
+
+# GFP+/-, 0.8 probability cut
+
+```{r}
+tbl_stats = metadata %>%
+              select(cellID, sampleID, gate, timepoint, prediction_TaxonomyRank1, probability_TaxonomyRank1) %>%
+              filter(probability_TaxonomyRank1 > 0.8) %>%
+              filter() %>%
+              group_by(sampleID) %>%
+              mutate(n_sample = n()) %>%
+              ungroup() %>%
+              filter(prediction_TaxonomyRank1 %in% c("Neuronal", "Glial")) %>%
+              group_by(sampleID, prediction_TaxonomyRank1) %>%
+              mutate(annot_frac = n()/n_sample) %>%
+              distinct() %>%
+              group_by(timepoint, prediction_TaxonomyRank1) %>%
+              summarise(annot_frac = mean(annot_frac)) %>%
+              group_by(timepoint) %>%
+              mutate(norm_timepoint = sum(annot_frac)) %>%
+              ungroup() %>%
+              mutate(annot_frac = annot_frac/norm_timepoint)
+
+
+plt_stats = ggplot(tbl_stats, aes(x=timepoint, y=annot_frac, fill=prediction_TaxonomyRank1)) +
+# geom_bar(stat="identity", position="dodge") +
+                geom_bar(stat="identity") +
+                scale_fill_manual(values=c("Neuronal"="#00BCF4",
+                                            "Glial"="#F8766D",
+                                            "Immune"="#7CAE00",
+                                            "Vascular/other"="#C77CFF"), drop=T) +
+                theme_publication +
+                labs(fill="") +
+                labs(x=NULL, y="Fraction")
+                
+```
+
+```{r, fig.asp=0.3}
+plt_stats
+```
+
+
+
+
+
+
+# Markers Aldh
+
+```{r}
+marker_list = c("Adhfe1", "Adh1", "Adh5", "Adh6b", "Adh7", "Aldh1a1",
+                "Aldh1a2", "Aldh1a3", "Aldh1a7", "Aldh1b1", "Aldh1l1", "Aldh1l2",
+                "Aldh2", "Aldh16a1", "Aldh18a1", "Aldh3a1", "Aldh3a2", "Aldh3b1",
+                "Aldh3b2", "Aldh3b3", "Aldh4a1", "Aldh5a1", "Aldh6a1", "Aldh7a1",
+                "Aldh9a1")
+
+levels_annot_scanpy = c("Embryonic RG",
+                        "Juvenile RG & TAPs",
+                        "Gliogenic precursors (aNSCs)",
+                        "Gliogenic precursors (APCs)",
+                        "Quiescent NSCs (dorsal)",
+                        "Quiescent NSCs (ventral)",
+                        "Early EmNBs [1]",
+                        "Early EmNBs [2]",
+                        "GE NBs [1]",
+                        "GE NBs [2]",
+                        "Hippocampal NBs [1]",
+                        "Hippocampal NBs [2]",
+                        "OPCs",
+                        "PreM-ODCs",
+                        "Oligodendrocytes [1]",
+                        "Oligodendrocytes [2]",
+                        "Ependymal cells",
+                        "GABAergic INs",
+                        "ImStNeurons",
+                        "Non-overlapping")
+
+
+
+metadata = metadata_scanpy
+
+tbl_expr = get_adata_raw_expr(marker_list)
+leiden_res_annot = "annot_leiden"
+annot_order = levels_annot_scanpy
+
+tbl_DE_expr = metadata %>%
+                select(cellID, !!(leiden_res_annot)) %>%
+                mutate(clusterID = get(leiden_res_annot)) %>%
+                left_join(tbl_expr, by="cellID") %>%
+                tidyr::pivot_longer(starts_with("expr_"), names_to="geneID", values_to="expr") %>%
+                mutate(geneID = gsub("expr_", "", geneID)) %>%
+                group_by(geneID, clusterID) %>%
+                summarise(frac_expressed = sum(expr > 0)/length(expr),
+                          expr_average = mean(expr)) %>%
+                ungroup() %>%
+                group_by(geneID) %>%
+                mutate(expr_scaled = expr_average/max(expr_average)) %>%
+                ungroup() %>%
+                mutate(geneID = factor(geneID, levels = marker_list)) %>%
+                mutate(clusterID = factor(clusterID, levels=rev(annot_order))) %>%
+                filter(!is.na(clusterID))
+
+# expr_Gene
+plt_DE_dotplot = ggplot(tbl_DE_expr, aes(x=geneID, y=clusterID, size=frac_expressed, colour=expr_scaled)) +
+                            geom_point(stroke=0) +
+                            scale_size_continuous(range = c(0, 2.0), limits=c(0, 1), breaks = c(0.1, 0.5, 1.0)) +
+                            theme_publication +
+                            scale_colour_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(colour = "Expr (scaled)") +
+                            guides(colour = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 1.5)) +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            labs(size = "Fraction expressing") +
+                            theme(legend.spacing.y = unit(0.05, 'cm')) +
+                            theme(legend.key.height = unit(0.2, "cm"))
+                            # legend.key.width = unit(0.1, "cm"))
+
+
+```
+
+
+```{r, fig.asp=0.7}
+plt_DE_dotplot
+```
+
+# UMAP marker genes
+
+
+```{r}
+source("code/core_functions_supp.R")
+
+
+marker_list = c("Adhfe1", "Adh1", "Adh5", "Adh6b", "Adh7", "Aldh1a1",
+                "Aldh1a2", "Aldh1a3", "Aldh1a7", "Aldh1b1", "Aldh1l1", "Aldh1l2",
+                "Aldh2", "Aldh16a1", "Aldh18a1", "Aldh3a1", "Aldh3a2", "Aldh3b1",
+                "Aldh3b2", "Aldh3b3", "Aldh4a1", "Aldh5a1", "Aldh6a1", "Aldh7a1",
+                "Aldh9a1")
+
+
+for(geneID in marker_list){
+  plt_UMAP_expr = plot_UMAP_expr(geneID)  +
+  guides(fill = guide_colorbar(barwidth = 0.3,
+                               barheight = 2))
+                               
+                               
+  ggsave(paste0("figures/figure_neuronal_glial/UMAP_", geneID, "_neuronal_glial.pdf"), plot=plt_UMAP_expr, height=4.5, width=8, units="cm")  
+}
+```
+
+
+# Export figures
+
+```{r}
+ggsave("figures/figure_neuronal_glial/UMAP_annot_neuronal_glial.pdf", plot=plt_UMAP_annot_neuronal_glial, height=10, width=13, units="cm")
+ggsave("figures/figure_neuronal_glial/UMAP_timepoints_neuronal_glial.pdf", plot=plt_UMAP_day, height=10, width=13, units="cm")
+
+# ggsave("figures/figure_ependymal_cells/UMAP_velocyto_timepoints_ependymal_cells.pdf", plot=plt_velocyto, height=5, width=9.15, units="cm")
+
+ggsave("figures/figure_neuronal_glial/barplot_logreg_GFP-pos-neg_cut_off_0.8_neuronal_glial.pdf", plot=plt_stats, height=3, width=12, units="cm")
+```
+
+
+```{r}
+ggsave("figures/figure_neuronal_glial/dotplot_markers_Aldh_neuronal_glial.pdf", plot=plt_DE_dotplot, height=8, width=12, units="cm")
+```

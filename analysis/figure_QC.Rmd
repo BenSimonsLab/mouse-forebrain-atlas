@@ -1,0 +1,160 @@
+---
+title: "Figure - QC"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+Overview of the developmental data-set.
+
+
+```{r setup, message=FALSE, warning=TRUE}
+knitr::opts_chunk$set(autodep = TRUE)
+library(ggplot2)
+library(viridis)
+library(patchwork)
+library(ggrepel)
+ 
+library(readr)
+library(dplyr)
+library(tibble)
+
+library(knitr)
+library(kableExtra)
+
+library(reticulate)
+
+source("code/core_settings.R")
+source("code/core_functions.R")
+source("code/core_functions_supp.R")
+```
+## QC stats
+
+```{r}
+fileIDs = c("normal_E12_5", "normal_E14_5", "normal_E16_5", "normal_P0", "normal_P2",
+            "normal_P7", "normal_P13", "normal_P19", "normal_P39", "normal_P111",
+            "normal_P365")
+
+list_metadata = list()
+
+
+for (fileID in fileIDs){
+  adata_path = paste0('data/forebrain_', fileID, '.h5ad')
+
+  py_run_string("import numpy as np")
+  py_run_string("import anndata as ad")
+
+  py_run_string("adata = ad.read_h5ad(r.adata_path)")
+
+  metadata_scanpy = as_tibble(py$adata$obs, rownames="cellID") %>%
+                      rename(mt_frac = percent_mito)
+                      
+  list_metadata[[fileID]] = metadata_scanpy
+}
+
+
+metadata = bind_rows(list_metadata)  %>%
+              mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+              mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp))
+```
+
+```{r}
+library(gridExtra)
+library(grid)
+
+tbl_stats = metadata %>%
+              group_by(timepoint) %>%
+              summarise("n cells post QC [GFP+ (Sox2)]" = sum(gate == "SOX2_+ve"),
+                        "n cells post QC [GFP-]" = sum(gate == "SOX2_-ve"),
+                        "n cells post QC [total]" = n()) #%>%
+              # mutate("QC pass" = "TBD") %>%
+              # mutate("n mice" = "TBD") #%>%
+              # rename(Timepoint = timepoint) %>%
+              # select(Timepoint, "n mice", "n cells [SOX2+]", "n cells [SOX2-]", "n cells [total]")
+
+
+tbl_pre_QC = read_csv("data/metadata_QC_normal.csv.gz") %>%
+                  group_by(timepoint) %>%
+                  summarise(n_pre_QC = n())
+
+tbl_stats = left_join(tbl_stats, tbl_pre_QC, by="timepoint") %>%
+                  mutate(`QC pass` = round(`n cells post QC [total]`/n_pre_QC*100, 2)) %>%
+                  rename(Timepoint = timepoint) %>%
+                  rename(`QC pass [%]` = `QC pass`) %>%
+                  select(Timepoint, "QC pass [%]", "n cells post QC [GFP+ (Sox2)]", "n cells post QC [GFP-]", "n cells post QC [total]")
+
+
+mytheme = gridExtra::ttheme_default(
+             core = list(padding=unit(c(1.5, 1.5), "mm")),
+             base_size=5)
+
+grob_table_stats = tableGrob(tbl_stats,theme=mytheme, rows=NULL)
+```
+
+```{r}
+grid.draw(grob_table_stats)
+```
+
+
+```{r}
+plt_violin_n_genes = ggplot(metadata, aes(timepoint, n_genes, fill=gate_gfp)) +
+                        geom_violin(draw_quantiles=c(0.25, 0.5, 0.75), size=0.2) +
+                        # scale_fill_manual(values=c("GFP-"="#696969", "GFP+ [SOX2]"="#AECEA5")) +
+                        # scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#83F52C")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        labs(fill="FACS gate") +
+                        labs(x=NULL, y="Number of genes per cell") +
+                        theme_publication +
+                        # guides(fill = guide_legend(override.aes = list(size = 1)))
+                        guides(fill = guide_legend(keyheight=0.3,
+                                                   keywidth=0.3,
+                                                   default.unit="cm"))
+                       # theme(legend.position="top")
+
+plt_violin_n_counts = ggplot(metadata, aes(timepoint, n_counts, fill=gate_gfp)) +
+                        geom_violin(draw_quantiles=c(0.25, 0.5, 0.75), size=0.2) +
+                        coord_cartesian(ylim = c(0, 3.5e4)) +
+                        # scale_fill_manual(values=c("GFP-"="#696969", "GFP+ [SOX2]"="#AECEA5")) +
+                        # scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#83F52C")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        labs(fill="FACS gate") +
+                        labs(x=NULL, y="UMIs per cell") +
+                        theme_publication +
+                        theme(legend.position="none")
+
+plt_violin_mt_frac = ggplot(metadata, aes(timepoint, mt_frac, fill=gate_gfp)) +
+                        geom_violin(draw_quantiles=c(0.25, 0.5, 0.75), size=0.2) +
+                        # scale_fill_manual(values=c("GFP-"="#696969", "GFP+ [SOX2]"="#AECEA5")) +
+                        # scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#83F52C")) +
+                        scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                        labs(fill="FACS gate") +
+                        labs(x=NULL, y="Fraction of mt reads per cell") +
+                        theme_publication +
+                        theme(legend.position="none")
+
+```
+
+```{r}
+panel_violin = plt_violin_n_genes + plt_violin_n_counts + plt_violin_mt_frac + plot_layout(ncol=1, heights=c(1, 1, 1))
+
+panel_violin
+```
+
+
+```{r}
+ggsave("figures/figure_QC/table_stats_QC.pdf", plot=grob_table_stats, height=3.7, width=10.5, units="cm")
+ggsave("figures/figure_QC/violin_n_genes_QC.pdf", plot=plt_violin_n_genes, height=3, width=18.3, units="cm")
+ggsave("figures/figure_QC/violin_n_counts_QC.pdf", plot=plt_violin_n_counts, height=3, width=18.3, units="cm")
+ggsave("figures/figure_QC/violin_mt_frac_QC.pdf", plot=plt_violin_mt_frac, height=3, width=18.3, units="cm")
+
+ggsave("figures/figure_QC/panel_violin_QC.pdf", plot=panel_violin, height=9, width=18.3, units="cm")
+```
+
+

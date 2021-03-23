@@ -1,0 +1,421 @@
+---
+title: "Figure - Overview"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+Overview of the developmental data-set.
+
+
+```{r setup, message=FALSE, warning=TRUE}
+knitr::opts_chunk$set(autodep = TRUE)
+library(ggplot2)
+library(viridis)
+library(patchwork)
+library(ggrepel)
+ 
+library(readr)
+library(dplyr)
+library(tibble)
+
+library(knitr)
+library(kableExtra)
+
+library(reticulate)
+
+source("code/core_settings.R")
+source("code/core_functions.R")
+source("code/core_functions_supp.R")
+```
+
+```{r}
+# set parameters
+fileID = "normal"
+leiden_res = 'leiden_0_4'
+leiden_res_annot = 'annot_leiden'
+
+adata_path = paste0('data/forebrain_', fileID, '.h5ad')
+
+# celltype_colours = colour_map
+# colour_celltypes = colour_map
+annot_order = names(celltype_colours)
+```
+
+```{r}
+#repl_python()
+py_run_string("import numpy as np")
+py_run_string("import anndata as ad")
+
+py_run_string("adata = ad.read_h5ad(r.adata_path)")
+```
+
+
+```{r, message=FALSE, warning=TRUE}
+metadata_scanpy = as_tibble(py$adata$obs, rownames="cellID") %>%
+                    rename(mt_frac = percent_mito) %>%
+                    mutate(UMAP_dim1 = py$adata$obsm[['X_umap']][,1],
+                           UMAP_dim2 = py$adata$obsm[['X_umap']][,2])
+
+metadata_experiment = read_tsv("data/metadata_experiment.tsv")
+results_cyclone = read_csv("data/cyclone/cyclone_merged.csv.gz", col_types="ccddd") %>%
+                    mutate(sampleID = sapply(cellID, function(cell) strsplit(cell, split="-")[[1]][3])) %>%
+                    left_join(metadata_experiment, by="sampleID") %>%
+                    mutate(cellID = gsub("-1", "", cellID)) %>%
+                    select(cellID, cyclone, cyclone_G1, cyclone_S, cyclone_G2M)
+
+results_logreg = read_csv(paste0("data/logreg/logreg_Zeisel_2018_normal.csv.gz"))
+
+
+# filter QC
+metadata = left_join(metadata_scanpy, results_cyclone, by="cellID") %>%
+              mutate(cyclone = factor(cyclone, levels=c("G1", "S", "G2M"))) %>%
+              mutate(timepoint = factor(timepoint, levels=unique(timepoint)[order(unique(postnatal_day))])) %>%
+              left_join(results_logreg, by="cellID") %>%
+              mutate(leiden = get(leiden_res))
+```
+
+```{r}
+metadata = metadata %>%
+            mutate(prediction_TaxonomyRank1 = gsub("Neurons", "Neuronal", prediction_TaxonomyRank1)) %>%
+            mutate(prediction_TaxonomyRank1 = gsub("^Glia$", "Glial", prediction_TaxonomyRank1)) %>%
+            mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+            mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp)) %>%
+            mutate(annot_leiden = plyr::revalue(annot_leiden, c("[unclear/debris]" = NA)))
+```
+
+
+
+# Markers
+
+```{r}
+marker_list = c("Sox2", "Nes", "Hes1", "Prom1", "Aldoc", "Mki67", "Slc1a3", "Vcam1",
+                "Ntsr2", "Aqp4", "Gja1", "Hopx", "Ptch1", "Nhlh2", "Nhlh1", "Ebf2",
+                "Ebf1", "Reln", "Dcx", "Dlx1", "Dlx2", "Dlx5", "Sp9", "Neurod2",
+                "Tbr1", "Olig2", "Olig1", "Pdgfra", "Fyn", "Plp1", "Mbp", "Foxj1",
+                "Gad2", "Gata2", "Gata3", "Rarb", "Col1a1", "Col1a2", "Csf1r", "P2ry12",
+                "Tmem119", "Cd14", "Mrc1", "Lyve1", "Cd3e", "Trbc1", "Alas2", "Hbb-bt",
+                "Ttr", "Flt1", "S100a8", "S100a9")
+
+
+tbl_expr = get_adata_raw_expr(marker_list)
+
+
+tbl_DE_expr = metadata %>%
+                select(cellID, !!(leiden_res_annot)) %>%
+                mutate(clusterID = get(leiden_res_annot)) %>%
+                left_join(tbl_expr, by="cellID") %>%
+                tidyr::pivot_longer(starts_with("expr_"), names_to="geneID", values_to="expr") %>%
+                mutate(geneID = gsub("expr_", "", geneID)) %>%
+                group_by(geneID, clusterID) %>%
+                summarise(frac_expressed = sum(expr > 0)/length(expr),
+                          expr_average = mean(expr)) %>%
+                ungroup() %>%
+                group_by(geneID) %>%
+                mutate(expr_scaled = expr_average/max(expr_average)) %>%
+                ungroup() %>%
+                mutate(geneID = factor(geneID, levels = marker_list)) %>%
+                mutate(clusterID = factor(clusterID, levels=rev(annot_order))) %>%
+                filter(!is.na(clusterID))
+
+# expr_Gene
+plt_DE_dotplot = ggplot(tbl_DE_expr, aes(x=geneID, y=clusterID, size=frac_expressed, colour=expr_scaled)) +
+                            geom_point(stroke=0) +
+                            scale_size_continuous(range = c(0, 2.0), limits=c(0, 1), breaks = c(0.1, 0.5, 1.0)) +
+                            theme_publication +
+                            scale_colour_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(colour = "Expr (scaled)") +
+                            guides(colour = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 1.5)) +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            labs(size = "Fraction expressing") +
+                            theme(legend.spacing.y = unit(0.05, 'cm')) +
+                            theme(legend.key.height = unit(0.2, "cm"))
+                            # legend.key.width = unit(0.1, "cm"))
+
+
+```
+
+
+```{r, fig.asp=0.7}
+plt_DE_dotplot_full = plt_DE_dotplot
+plt_DE_dotplot_full
+```
+
+
+# Timepoints
+
+
+```{r}
+colour_map = c("E12.5"="#fdcc8a",
+              "E14.5"="#fc8d59",
+              "E16.5"="#d7301f",
+              "P0"="#bdc9e1",
+              "P2"="#74a9cf",
+              "P7"="#0570b0",
+              "P13"="#d9d9d9",
+              "P19"="#bdbdbd",
+              "P39"="#969696",
+              "P111"="#636363",
+              "P365"="#252525")
+
+library(ggrastr)
+                            
+plt_UMAP_day = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=timepoint)) +
+                            # geom_point(size=0.05, alpha=0.8, shape=16) +
+                            # geom_point_rast(size=0.05, alpha=0.8, shape=16, raster.dpi=300) +
+                            # geom_point_rast(size=0.05, alpha=0.8, shape=16, raster.dpi=600) +
+                            geom_point_rast(size=0.1, stroke=0, alpha=0.8, shape=16, raster.dpi=600) +
+                            # scale_colour_viridis(discrete=T) +
+                            scale_color_manual(values=colour_map) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Time point") +
+                            guides(colour = guide_legend(override.aes = list(size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+```
+
+```{r}
+plt_UMAP_day
+```
+
+# Logreg & RNA velocity
+
+
+```{r}
+library(png)
+library(grid)
+
+
+tbl_annot_coarse_empty = tibble(annot_coarse = factor(c("Neuronal", "Glial", "Immune", "Vascular/other"), levels=c("Neuronal", "Glial", "Immune", "Vascular/other")),
+                                UMAP_dim1 = c(0, 1, 0, 1),
+                                UMAP_dim2 = c(0, 1, 0, 1))
+
+plt_UMAP_empty = ggplot(tbl_annot_coarse_empty, aes(x=UMAP_dim1, y=UMAP_dim2, colour=annot_coarse)) +
+                            # geom_blank() +
+                            geom_point(shape=16, alpha=0) +
+                            scale_color_manual(values=c("Neuronal"="#00BCF4",
+                                                        "Glial"="#F8766D",
+                                                        "Immune"="#7CAE00",
+                                                        "Vascular/other"="#C77CFF"), drop=FALSE) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Logreg [Zeisel 2018]") +
+                            guides(colour = guide_legend(override.aes = list(alpha=1, size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+
+
+
+img_velo = readPNG("figures/figure_1/scvelo/scvelo_stochastic_normal_logreg_Zeisel_2018_dpi_600_no_legend.png")
+g_velo = rasterGrob(img_velo, interpolate=TRUE)
+
+plt_velocyto = plt_UMAP_empty +
+                  annotation_custom(g_velo, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf)
+```
+
+```{r}
+plt_velocyto
+```
+
+
+
+## Sox2 gating & expression
+
+
+
+
+```{r}
+plt_UMAP_gate = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=gate_gfp)) +
+                            geom_point_rast(size=0.1, stroke=0, alpha=0.8, shape=16, raster.dpi=600) +
+                            # scale_colour_manual(values=c("SOX2_-ve"="#696969", "SOX2_+ve"="#AECEA5")) +
+                            # scale_colour_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#83F52C")) +
+                            scale_colour_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Gate") +
+                            guides(colour = guide_legend(override.aes = list(size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+                            
+# plt_UMAP_gate = plt_UMAP_gate +
+#                   theme(legend.position="top") +
+#                   theme(legend.margin=margin(-1.5, 0, -1.5, 0, unit='cm')) +
+#                   theme(legend.background=element_blank())
+
+
+
+plt_UMAP_Sox2 = plot_UMAP_expr("Sox2")  +
+guides(fill = guide_colorbar(barwidth = 0.3,
+                             barheight = 2))
+                             
+                             
+plt_UMAP_Sox2_rescaled = plt_UMAP_Sox2 + scale_colour_viridis(option="magma", rescaler = function(x, from = NULL) {
+                              ifelse(x<2, 
+                                     scales::rescale(x,
+                                                     to = c(0, 0.5),
+                                                     from = c(min(x, na.rm = TRUE), 2)),
+                                     scales::rescale(x,
+                                                     to = c(0.5, 1),
+                                                     from = c(2, max(x, na.rm = TRUE))))}) +
+                                     guides(colour = guide_colorbar(barwidth = 0.3,
+                                                                  barheight = 2)) +
+                                     labs(colour = "Sox2 [log1p]") + 
+                                     scale_fill_viridis(option="magma", rescaler = function(x, from = NULL) {
+                                       ifelse(x<2, 
+                                              scales::rescale(x,
+                                                              to = c(0, 0.5),
+                                                              from = c(min(x, na.rm = TRUE), 2)),
+                                              scales::rescale(x,
+                                                              to = c(0.5, 1),
+                                                              from = c(2, max(x, na.rm = TRUE))))})
+```
+
+
+```{r, fig.asp=0.3}
+plt_UMAP_gate | plt_UMAP_Sox2
+```
+
+
+## Cell cycle
+
+```{r}
+expr_cellcycle = get_adata_raw_expr(c("Mki67", "Top2a"))
+
+
+metadata_cc = metadata %>%
+            left_join(expr_cellcycle, by="cellID") %>%
+            mutate(cell_cycle = if_else(expr_Mki67 > 1 | expr_Top2a > 1, as.vector(cyclone), "G0")) %>%
+            mutate(cell_cycle = factor(cell_cycle, levels=c("G0", "G1", "S", "G2M"))) %>%
+            arrange(cell_cycle) %>%
+            slice(c(1:sum(cell_cycle == "G0"), sample((sum(cell_cycle == "G0") + 1):n())))
+```
+
+
+```{r}
+plt_UMAP_cellcycle = ggplot(metadata_cc, aes(x=UMAP_dim1, y=UMAP_dim2, colour=cell_cycle)) +
+                            geom_point_rast(size=0.05, stroke=0, alpha=0.8, shape=16, raster.dpi=600) +
+                            scale_color_manual(values=c("G0"="#D0DFE6", "G1"="#19476F", "S"="#E47E00", "G2M"="#90353B")) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Cell cycle") +
+                            # labs(title=NULL) +
+                            guides(colour = guide_legend(override.aes = list(size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+                                                         
+plt_UMAP_cellcycle
+```
+
+```{r, fig.asp=1.5}
+library(ggnewscale)
+
+metadata_development = metadata %>%
+                        mutate(leiden_annot = get(leiden_res_annot)) %>%
+                        filter(!is.na(leiden_annot)) %>%
+                        group_by(leiden_annot) %>%
+                        summarise(n_cells = n()) %>%
+                        mutate(leiden_annot = factor(leiden_annot, levels = rev(names(celltype_colours))))
+
+plt_timeline_vertical = ggplot(metadata_development, aes(x=leiden_annot, y=n_cells, fill=leiden_annot)) +
+                  geom_bar(stat="identity", position="dodge") +
+                  geom_text(aes(label=n_cells, y=n_cells+50), size=1.78, hjust = 0) +
+                  scale_fill_manual(values=celltype_colours) +
+                  theme_publication +
+                  labs(x=element_blank(), y="Number of cells") +
+                  # scale_y_continuous(expand = c(0, 0), limits=c(0, 8400)) +
+                  # scale_y_continuous(expand = c(0, 0), limits=c(0, 12990)) +
+                  scale_y_continuous(expand = c(0, 0), limits=c(0, 14000)) +
+                  coord_flip(clip = "off") +
+                  theme(legend.position="none") +
+                  theme(panel.border = element_blank(), axis.line = element_line(colour = "black")) +
+                  # theme(axis.text.y = element_text(face = c(rep('plain', dim(metadata_development)[1] - 13)), rep('bold', 13))) +
+                  labs(title=paste0("Total: ", sum(metadata_development$n_cells), " cells")) #+
+                  # theme(axis.text.y = element_text(hjust=0))
+
+
+# https://stackoverflow.com/questions/20571306/multi-row-x-axis-labels-in-ggplot-line-chart
+plt_timeline_vertical
+```
+
+```{r, fig.asp=0.7}
+plt_timeline_horizontal = ggplot(metadata_development, aes(x=leiden_annot, y=n_cells, fill=leiden_annot)) +
+                  geom_bar(stat="identity", position="dodge") +
+                  geom_text(aes(label=n_cells, y=n_cells+20), size=1.78, hjust = 0.5, vjust=0) +
+                  scale_fill_manual(values=celltype_colours) +
+                  theme_publication +
+                  labs(x=element_blank(), y="Number of cells") +
+                  # scale_y_continuous(expand = c(0, 0), limits=c(0, 8400)) +
+                  scale_y_continuous(expand = c(0, 0), limits=c(0, 14000)) +
+                  # coord_flip(clip = "off") +
+                  theme(legend.position="none") +
+                  theme(panel.border = element_blank(), axis.line = element_line(colour = "black")) +
+                  # theme(axis.text.y = element_text(face = c(rep('plain', dim(metadata_development)[1] - 13)), rep('bold', 13))) +
+                  labs(title=paste0("Total: ", sum(metadata_development$n_cells), " cells")) +
+                  theme(axis.text.x = element_text(angle = 45, hjust=1))
+                  # theme(axis.text.x = element_text(angle = 45, vjust=0.5, hjust=1))
+                  # theme(axis.text.y = element_text(hjust=0))
+
+# https://stackoverflow.com/questions/20571306/multi-row-x-axis-labels-in-ggplot-line-chart
+plt_timeline_horizontal
+```
+
+
+```{r}
+panel_time_velocyto_gate_Sox2_top_only = plt_UMAP_day + plt_velocyto + plot_spacer() + plot_spacer()
+panel_time_velocyto_gate_Sox2_top_only
+
+
+panel_time_velocyto_gate_Sox2 = plt_UMAP_day + plt_velocyto + plt_UMAP_gate + plt_UMAP_Sox2
+panel_time_velocyto_gate_Sox2
+```
+
+# Export figures
+
+```{r}
+ggsave("figures/figure_overview/dotplot_manual_markers_overview.pdf", plot=plt_DE_dotplot_full, height=10, width=18.3, units="cm")
+
+ggsave("figures/figure_overview/panel_UMAP_GFP_Sox2_overview.pdf", plot=plt_UMAP_gate | plt_UMAP_Sox2, height=4.5, width=11.3, units="cm")
+
+ggsave("figures/figure_overview/panel_UMAP_GFP_Sox2_rescaled_overview.pdf", plot=plt_UMAP_gate | plt_UMAP_Sox2_rescaled, height=4.5, width=11.3, units="cm")
+
+ggsave("figures/figure_overview/UMAP_cell_cycle_overview.pdf", plot=plt_UMAP_cellcycle, height=6, width=9, units="cm")
+
+
+ggsave("figures/figure_overview/barplot_cluster_cellcounts_overview_horizontal.pdf", plot=plt_timeline_horizontal, height=5, width=18.3, units="cm")
+
+ggsave("figures/figure_overview/barplot_cluster_cellcounts_overview_vertical.pdf", plot=plt_timeline_vertical, height=12, width=8, units="cm")
+```
+
+
+```{r}
+ggsave("figures/figure_overview/panel_UMAP_timepoints_velocyto_GFP_Sox2_overview.pdf", plot=panel_time_velocyto_gate_Sox2, height=10, width=18.3, units="cm")
+
+ggsave("figures/figure_overview/panel_UMAP_timepoints_velocyto_GFP_Sox2_overview_top_only.pdf", plot=panel_time_velocyto_gate_Sox2_top_only, height=10, width=18.3, units="cm")
+
+```

@@ -1,0 +1,813 @@
+---
+title: "Figure - OPCs"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+Overview of the developmental data-set.
+
+
+```{r setup, message=FALSE, warning=TRUE}
+knitr::opts_chunk$set(autodep = TRUE)
+library(ggplot2)
+library(viridis)
+library(patchwork)
+library(ggrepel)
+ 
+library(readr)
+library(dplyr)
+library(tibble)
+
+library(knitr)
+library(kableExtra)
+
+library(reticulate)
+
+source("code/core_settings.R")
+source("code/core_functions.R")
+```
+
+```{r}
+# set parameters
+fileID = "normal_subset_OPCs"
+leiden_res = 'leiden_0_1'
+leiden_res_annot = 'annot_leiden_0_1'
+
+adata_path = paste0('data/forebrain_', fileID, '.h5ad')
+
+
+colour_map = c("Juvenile OPCs [cycling]" = "#005579",
+                "Juvenile OPCs" = "#C9EBFB",
+                "Adult OPCs" = "#FBBE92")
+
+colour_map = c("Juvenile OPCs [cycling]" = "#EF5A9D",
+                "Juvenile OPCs" = "#FF891C",
+                "Adult OPCs" = "#139992")
+
+
+annot_order = names(colour_map)
+celltype_colours = colour_map
+colour_celltypes = colour_map
+```
+
+```{r}
+#repl_python()
+py_run_string("import numpy as np")
+py_run_string("import anndata as ad")
+
+py_run_string("adata = ad.read_h5ad(r.adata_path)")
+```
+
+
+```{r, message=FALSE, warning=TRUE}
+metadata_scanpy = as_tibble(py$adata$obs, rownames="cellID") %>%
+                    rename(mt_frac = percent_mito) %>%
+                    mutate(UMAP_dim1 = py$adata$obsm[['X_umap']][,1],
+                           UMAP_dim2 = py$adata$obsm[['X_umap']][,2])
+
+metadata_experiment = read_tsv("data/metadata_experiment.tsv")
+results_cyclone = read_csv("data/cyclone/cyclone_merged.csv.gz", col_types="ccddd") %>%
+                    mutate(sampleID = sapply(cellID, function(cell) strsplit(cell, split="-")[[1]][3])) %>%
+                    left_join(metadata_experiment, by="sampleID") %>%
+                    mutate(cellID = gsub("-1", "", cellID)) %>%
+                    select(cellID, cyclone, cyclone_G1, cyclone_S, cyclone_G2M)
+
+results_logreg = read_csv(paste0("data/logreg/logreg_Zeisel_2018_normal.csv.gz"))
+
+
+# filter QC
+metadata = left_join(metadata_scanpy, results_cyclone, by="cellID") %>%
+              mutate(cyclone = factor(cyclone, levels=c("G1", "S", "G2M"))) %>%
+              mutate(timepoint = factor(timepoint, levels=unique(timepoint)[order(unique(postnatal_day))])) %>%
+              left_join(results_logreg, by="cellID") %>%
+              mutate(leiden = get(leiden_res))
+```
+
+```{r}
+metadata = metadata %>%
+            mutate(prediction_TaxonomyRank1 = gsub("Neurons", "Neuronal", prediction_TaxonomyRank1)) %>%
+            mutate(prediction_TaxonomyRank1 = gsub("^Glia$", "Glial", prediction_TaxonomyRank1)) %>%
+            mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+            mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp)) %>%
+            mutate(annot_leiden = plyr::revalue(annot_leiden, c("[unclear/debris]" = NA)))
+```
+
+
+
+# Timepoints
+
+
+```{r}
+library(ggrastr)
+                            
+plt_UMAP_day = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=timepoint)) +
+                            # geom_point(size=0.05, alpha=0.8, shape=16) +
+                            geom_point_rast(size=0.05, alpha=0.8, shape=16, raster.dpi=300) +
+                            # scale_colour_viridis(discrete=T) +
+                            scale_color_manual(values=colour_timepoints) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Time point") +
+                            guides(colour = guide_legend(override.aes = list(size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+```
+
+```{r}
+plt_UMAP_day
+```
+
+# Logreg & RNA velocity
+
+
+```{r}
+# library(png)
+# library(grid)
+# 
+# 
+# tbl_annot_coarse_empty = tibble(annot_coarse = factor(names(colour_map), levels=names(colour_map)),
+#                                 UMAP_dim1 = c(0, 1, 0, 1, 1, 1, 0),
+#                                 UMAP_dim2 = c(0, 1, 0, 1, 1, 1, 0))
+# 
+# plt_UMAP_empty = ggplot(tbl_annot_coarse_empty, aes(x=UMAP_dim1, y=UMAP_dim2, colour=annot_coarse)) +
+#                             # geom_blank() +
+#                             geom_point(shape=16, alpha=0) +
+#                             scale_color_manual(values=c(colour_map), drop=FALSE) +
+#                             theme_publication +
+#                             labs(x="UMAP 1", y="UMAP 2") +
+#                             theme(axis.text.x=element_blank(),
+#                                   axis.ticks.x=element_blank(),
+#                                   axis.text.y=element_blank(),
+#                                   axis.ticks.y=element_blank()) +
+#                             labs(colour=NULL) +
+#                             guides(colour = guide_legend(override.aes = list(alpha=1, size=2),
+#                                                          keyheight=0.3,
+#                                                          default.unit="cm"))
+# 
+# 
+# 
+# img_velo = readPNG("figures/figure_NBs/scvelo/scvelo_stochastic_normal_subset_neuronal_glial_cleaned_subset_NBs_cleaned_annot_leiden_dpi_600_no_legend.png")
+# g_velo = rasterGrob(img_velo, interpolate=TRUE)
+# 
+# plt_velocyto = plt_UMAP_empty +
+#                   annotation_custom(g_velo, xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=Inf)
+```
+
+```{r}
+# plt_velocyto
+```
+
+
+# Cluster annotation
+
+
+```{r}
+library(ggrepel)
+library(ggthemes)
+library(ggrastr)
+
+plot_UMAP_leiden <- function(leiden_key){
+  
+  metadata = metadata %>%
+              mutate(leiden = get(leiden_key))
+              
+  cl_cent = metadata %>%
+                  select(UMAP_dim1, UMAP_dim2, leiden) %>%
+                  group_by(leiden) %>%
+                  summarize_all(mean)
+  
+  # randomise order for plot
+  plt_UMAP_leiden = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=leiden)) +
+                              # geom_point(size=0.2, alpha=0.8, shape=16) +
+                              geom_point_rast(size=0.2, alpha=0.8, shape=16, raster.dpi=300) +
+                              # geom_point_rast(size=0.2, alpha=0.8, shape=16, raster.dpi=600) +
+                              geom_label_repel(aes(x=UMAP_dim1, y=UMAP_dim2, label=leiden),
+                                      fill='white', colour='black', label.size=NA,
+                                      alpha=0.9, label.padding = 0.1, point.padding = 0,
+                                      data=cl_cent, size=1.78, show.legend=FALSE, inherit.aes=F) +
+                              scale_colour_manual(values=celltype_colours) +
+                              theme_publication +
+                              labs(x="UMAP 1", y="UMAP 2") +
+                              theme(axis.text.x=element_blank(),
+                                    axis.ticks.x=element_blank(),
+                                    axis.text.y=element_blank(),
+                                    axis.ticks.y=element_blank()) +
+                              # guides(color = guide_legend(override.aes = list(size=3))) +
+                              # labs(colour="Leiden")
+                              # labs(title=paste0(leiden_key)) +
+                              theme(legend.position="none")
+
+  return(plt_UMAP_leiden)
+}
+```
+
+```{r}
+plt_UMAP_annot_OPCs = plot_UMAP_leiden("annot_leiden")
+plt_UMAP_annot_OPCs
+```
+
+
+# Markers
+
+```{r}
+marker_list = c("Olig1", "Olig2", "Pdgfra", "Top2a", "Mki67")
+
+tbl_markers = get_adata_raw_expr(marker_list) %>%
+                left_join(metadata %>% select(annot_leiden, cellID), by="cellID") %>%
+                rename("leiden_res_annot" = annot_leiden) %>%
+                select(-cellID)
+
+tbl_markers_melt = as_tibble(melt(tbl_markers, id.vars="leiden_res_annot", value.name="expr", variable.name='geneID')) %>%
+                      mutate(geneID = gsub("^expr_", "", geneID)) %>%
+                      mutate(geneID = gsub("Nkx2_1", "Nkx2-1", geneID)) %>%
+                      filter(geneID %in% marker_list)
+
+tbl_markers_average = tbl_markers_melt %>%
+                        group_by(geneID, leiden_res_annot) %>%
+                        summarise(mean_expr = mean(expr),
+                                  fraction_expressed = sum(expr > 0)/n()) %>%
+                        group_by(geneID) %>%
+                        mutate(mean_expr = mean_expr/max(mean_expr)) %>%
+                        ungroup()
+
+tbl_markers_sub = tbl_markers_average %>% select(-fraction_expressed)
+
+data_wide = tidyr::spread(tbl_markers_sub, leiden_res_annot, mean_expr)
+cmat = data_wide %>% ungroup() %>% select(-geneID) %>% as.matrix()
+rownames(cmat) = as.vector(data_wide$geneID)
+```
+
+```{r}
+tbl_markers_average = tbl_markers_average %>%
+                        mutate(leiden_res_annot = factor(leiden_res_annot, levels = annot_order)) %>%
+                        # mutate(geneID = factor(geneID, levels =rownames(cmat)[mat_cluster_rows$order]))
+                        mutate(geneID = factor(geneID, levels=marker_list))
+
+
+plt_cluster_marker_expr = ggplot(tbl_markers_average, aes(x=geneID, y=leiden_res_annot, fill=mean_expr)) +
+                            geom_tile() +
+                            scale_fill_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            labs(x=NULL, y=NULL) +
+                            scale_x_discrete(expand = c(0,0)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(fill="Expr (scaled)") +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            # guides(fill = guide_colorbar(barwidth = 0.5,
+                            #                              barheight = 3))
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+
+```
+
+```{r, fig.asp=0.25}
+plt_cluster_marker_expr_OPCs = plt_cluster_marker_expr
+plt_cluster_marker_expr_OPCs
+```
+
+
+```{r}  
+tbl_expr = get_adata_raw_expr(marker_list)
+
+
+tbl_DE_expr = metadata %>%
+                select(cellID, annot_leiden) %>%
+                mutate(clusterID = annot_leiden) %>%
+                left_join(tbl_expr, by="cellID") %>%
+                tidyr::pivot_longer(starts_with("expr_"), names_to="geneID", values_to="expr") %>%
+                mutate(geneID = gsub("expr_", "", geneID)) %>%
+                group_by(geneID, clusterID) %>%
+                summarise(frac_expressed = sum(expr > 0)/length(expr),
+                          expr_average = mean(expr)) %>%
+                ungroup() %>%
+                group_by(geneID) %>%
+                mutate(expr_scaled = expr_average/max(expr_average)) %>%
+                # mutate(expr_scaled = (expr_average - min(expr_average))/(max(expr_average) - min(expr_average))) %>%
+                # mutate(expr_scaled = (expr - min(expr))/(max(expr) - min(expr))) %>%
+                # mutate(expr_scaled_cut = ifelse(expr_scaled > 2.5, 2.5, ifelse(expr_scaled < -2.5, -2.5, expr_scaled))) %>%                  
+                ungroup() %>%
+                mutate(clusterID = factor(clusterID, levels = annot_order)) %>%
+                mutate(geneID = factor(geneID, levels = marker_list))
+
+# expr_Gene
+plt_DE_dotplot = ggplot(tbl_DE_expr, aes(x=geneID, y=clusterID, size=frac_expressed, colour=expr_scaled)) +
+                            # geom_point() +
+                            # scale_size_continuous(range = c(0.1, 2.0), limits=c(0, 1), breaks = c(0.1, 0.5, 1.0)) +
+                            geom_point(stroke=0) +
+                            scale_size_continuous(range = c(0, 2.0), limits=c(0, 1), breaks = c(0, 0.5, 1.0)) +
+                            theme_publication +
+                            scale_colour_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(colour = "Expr (scaled)") +
+                            guides(colour = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 1.5)) +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            labs(size = "Fraction expressing") +
+                            theme(legend.spacing.y = unit(0.05, 'cm')) +
+                            theme(legend.key.height = unit(0.2, "cm"))
+
+```
+
+
+```{r, fig.asp=0.4}
+plt_marker_dotplot_OPCs = plt_DE_dotplot
+plt_marker_dotplot_OPCs
+```
+
+
+
+# Top 10 DE Markers based on cluster LFC
+
+
+```{r}
+file_paths_DE = list.files(path=paste0("output/", fileID, "/DE-voom_limma"), pattern="DE-voom_limma_*.*_DE_leiden_0_*", full.names=T)
+
+
+tbl_top_DE = tibble(geneID = character(),
+                    cluster_LFC = numeric(),
+                    clusterID = character())
+
+
+for (file_path in file_paths_DE){
+  file_name = basename(file_path)
+  clusterID = stringr::str_extract(stringr::str_extract(file_name, "cl_[0-9]+_vs_rest"), "[0-9]+")
+  
+  top_DE_cluster = read_csv(file_path, col_types="cddddddd") %>%
+                          filter(qval < 0.05) %>%
+                          filter(log2fc < 0) %>%
+                          arrange(cluster_LFC) %>%
+                          slice(1:10) %>%
+                          mutate(clusterID = clusterID) %>%
+                          select(geneID, cluster_LFC, clusterID)
+                          
+  tbl_top_DE = bind_rows(tbl_top_DE, top_DE_cluster)
+}
+
+tbl_top_DE = tbl_top_DE %>%
+              left_join(metadata %>%
+                            mutate(clusterID = leiden) %>%
+                            select(clusterID, annot_leiden) %>%
+                            distinct(), by="clusterID") %>%
+              mutate(annot_leiden = factor(annot_leiden, levels=annot_order)) %>%
+              arrange(annot_leiden, cluster_LFC)
+
+top_DE = tbl_top_DE %>%
+            pull(geneID) %>%
+            unique()
+```
+
+```{r, message=FALSE, warning=TRUE}
+marker_list = top_DE
+
+tbl_markers = get_adata_raw_expr(marker_list) %>%
+                left_join(metadata %>% select(!!(leiden_res_annot), cellID), by="cellID") %>%
+                rename("leiden_res_annot" = !!(leiden_res_annot)) %>%
+                select(-cellID)
+
+
+tbl_markers_melt = as_tibble(melt(tbl_markers, id.vars="leiden_res_annot", value.name="expr", variable.name='geneID')) %>%
+                      mutate(geneID = gsub("^expr_", "", geneID)) %>%
+                      mutate(geneID = gsub("Nkx2_1", "Nkx2-1", geneID)) %>%
+                      filter(geneID %in% marker_list)
+
+tbl_markers_average = tbl_markers_melt %>%
+                        group_by(geneID, leiden_res_annot) %>%
+                        # mutate(expr = (expr - min(expr))/(max(expr) - min(expr))) %>%
+                        summarise(mean_expr = mean(expr),
+                                  fraction_expressed = sum(expr > 0)/n()) %>%
+                        group_by(geneID) %>%
+                        mutate(mean_expr = mean_expr/max(mean_expr)) %>%
+                        ungroup()
+
+tbl_markers_sub = tbl_markers_average %>% select(-fraction_expressed)
+
+data_wide = tidyr::spread(tbl_markers_sub, leiden_res_annot, mean_expr)
+cmat = data_wide %>% ungroup() %>% select(-geneID) %>% as.matrix()
+rownames(cmat) = as.vector(data_wide$geneID)
+```
+
+```{r, message=FALSE, warning=TRUE}
+tbl_markers_average = tbl_markers_average %>%
+                        mutate(leiden_res_annot = factor(leiden_res_annot, levels = annot_order)) %>%
+                       # mutate(leiden_res_annot = factor(leiden_res_annot, levels=c("Embryonic RG", "Juvenile RG", "Active NSCs", "Quiescent NSCs [1]", "Quiescent NSCs [2]"))) %>%
+                        # mutate(geneID = factor(geneID, levels =rownames(cmat)[mat_cluster_rows$order]))
+                        mutate(geneID = factor(geneID, levels=marker_list))
+
+
+library("RColorBrewer")
+
+plt_cluster_marker_expr = ggplot(tbl_markers_average, aes(x=geneID, y=leiden_res_annot, fill=mean_expr)) +
+                            geom_tile() +
+                            scale_fill_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            labs(x=NULL, y=NULL) +
+                            scale_x_discrete(expand = c(0,0)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(fill="Expr (scaled)") +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r, fig.asp=0.25}
+plt_DE_marker_annot_horizontal = plt_cluster_marker_expr
+plt_DE_marker_annot_horizontal
+```
+
+
+
+```{r, fig.asp=2.2}
+plt_cluster_marker_expr = ggplot(tbl_markers_average, aes(x=leiden_res_annot, y=geneID, fill=mean_expr)) +
+                            geom_tile() +
+                            scale_fill_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            labs(x=NULL, y=NULL) +
+                            scale_x_discrete(expand = c(0,0)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(fill="Expr (scaled)") +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+
+
+plt_DE_marker_annot_vertical = plt_cluster_marker_expr
+plt_DE_marker_annot_vertical
+```
+
+
+
+
+```{r}  
+tbl_expr = get_adata_raw_expr(marker_list)
+
+
+tbl_DE_expr = metadata %>%
+                select(cellID, !!(leiden_res_annot)) %>%
+                # mutate(clusterID = get(leiden_res_annot)) %>%
+                mutate(clusterID = get(leiden_res_annot)) %>%
+                mutate(clusterID = gsub(" precursors", "", clusterID)) %>%
+                mutate(clusterID = gsub("Early gliogenic", "Gliogenic", clusterID)) %>%
+                left_join(tbl_expr, by="cellID") %>%
+                tidyr::pivot_longer(starts_with("expr_"), names_to="geneID", values_to="expr") %>%
+                mutate(geneID = gsub("expr_", "", geneID)) %>%
+                group_by(geneID, clusterID) %>%
+                summarise(frac_expressed = sum(expr > 0)/length(expr),
+                          expr_average = mean(expr)) %>%
+                ungroup() %>%
+                group_by(geneID) %>%
+                mutate(expr_scaled = expr_average/max(expr_average)) %>%
+                # mutate(expr_scaled = (expr_average - min(expr_average))/(max(expr_average) - min(expr_average))) %>%
+                # mutate(expr_scaled = (expr - min(expr))/(max(expr) - min(expr))) %>%
+                # mutate(expr_scaled_cut = ifelse(expr_scaled > 2.5, 2.5, ifelse(expr_scaled < -2.5, -2.5, expr_scaled))) %>%                  
+                ungroup() %>%
+                mutate(clusterID = factor(clusterID, levels = annot_order)) %>%
+                mutate(geneID = factor(geneID, levels = marker_list))
+
+# expr_Gene
+plt_DE_dotplot = ggplot(tbl_DE_expr, aes(x=geneID, y=clusterID, size=frac_expressed, colour=expr_scaled)) +
+                            # geom_point() +
+                            # scale_size_continuous(range = c(0.1, 2.0), limits=c(0, 1), breaks = c(0.1, 0.5, 1.0)) +
+                            geom_point(stroke=0) +
+                            scale_size_continuous(range = c(0, 2.0), limits=c(0, 1), breaks = c(0, 0.5, 1.0)) +
+                            theme_publication +
+                            scale_colour_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(colour = "Expr (scaled)") +
+                            guides(colour = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 1.5)) +
+                            theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                            labs(size = "Fraction expressing") +
+                            theme(legend.spacing.y = unit(0.05, 'cm')) +
+                            theme(legend.key.height = unit(0.2, "cm"))
+
+```
+
+
+```{r, fig.asp=0.4}
+plt_DE_marker_dotplot_OPCs = plt_DE_dotplot
+plt_DE_marker_dotplot_OPCs
+```
+
+
+
+
+
+# SCENIC
+
+```{r, message=FALSE, warning=FALSE}
+source("code/core_functions_supp.R")
+
+
+
+tbl_scenic_auc = read.csv(paste0("data/scenic/auc_mtx_", fileID, ".csv.gz"), row.names=1, check.names=FALSE)
+
+tbl_scenic_auc_z_score = as_tibble(scale(tbl_scenic_auc), rownames="cellID")
+
+tbl_scenic_rss_group = read_csv(paste0("data/scenic/rss_normal_subset_OPCs_leiden_0_1.csv.gz")) %>%
+                          rename(group = X1)
+
+
+
+
+metadata_scenic = left_join(metadata %>% select(cellID, annot_leiden), as_tibble(tbl_scenic_auc, rownames="cellID"), by="cellID")
+
+library(reshape2)
+
+metadata_scenic_long = metadata_scenic %>%
+                      melt(id.vars = c("cellID", "annot_leiden"),
+                          variable.name = "pathway",
+                          value.name= "AUC_score") %>%
+                      as_tibble()
+
+
+metadata = metadata %>%
+              mutate(group_num = get(leiden_res)) %>%
+              mutate(group = get(leiden_res_annot)) %>%
+              mutate(group = factor(group, levels=annot_order))
+```
+
+
+
+```{r}
+topreg = c()
+n_genes = 10
+
+num_order = metadata %>%
+                select(group, group_num) %>%
+                distinct() %>%
+                arrange(group) %>%
+                pull(group_num) %>%
+                as.vector()
+
+for (groupID in num_order){
+  top_group = tbl_scenic_rss_group %>%
+                  filter(group == groupID) %>%
+                  melt(id.vars="group") %>%
+                  as_tibble() %>%
+                  arrange(desc(value)) %>%
+                  head(n_genes) %>%
+                  pull(variable) %>%
+                  as.vector()
+  topreg = c(topreg, top_group)
+}
+
+
+metadata_scenic_long = metadata_scenic_long %>%
+                          filter(pathway %in% topreg)
+```
+
+
+```{r}
+metadata_scaled_AUC = metadata_scenic_long %>%
+                  group_by(pathway) %>%
+                  mutate(norm_AUC_score = scale(AUC_score)) %>%
+                  ungroup() %>%
+                  group_by(pathway, annot_leiden) %>%
+                  summarise(mean_AUC_score = mean(AUC_score),
+                            mean_norm_AUC_score = mean(norm_AUC_score)) %>%
+                  group_by(pathway) %>%
+                  mutate(norm_mean_AUC_score = scale(mean_AUC_score))                  
+```
+
+```{r}
+# data_wide <- spread(olddata_long, condition, measurement)
+tbl_scores = metadata_scaled_AUC %>%
+            select(-c(mean_AUC_score, mean_norm_AUC_score)) %>%
+            tidyr::spread(pathway, norm_mean_AUC_score)
+
+cmat = as.matrix(tbl_scores %>% select(-annot_leiden))
+rownames(cmat) = tbl_scores %>% pull(annot_leiden)
+
+c <- cor(cmat, method="spearman")
+d <- as.dist(1-c)  # because correlation is a similarity measure and
+mat_cluster_cols <- hclust(d)
+
+c <- cor(t(cmat), method="spearman")
+d <- as.dist(1-c)  # because correlation is a similarity measure and
+mat_cluster_rows <- hclust(d)
+
+order_annot = rownames(cmat)[mat_cluster_rows$order]
+order_pathways = colnames(cmat)[mat_cluster_cols$order]
+
+
+metadata_scaled_AUC = metadata_scaled_AUC %>%
+                mutate(pathway = factor(pathway, levels=order_pathways)) %>%
+                mutate(annot_leiden = factor(annot_leiden, levels=order_annot))
+```
+
+```{r}
+metadata_scaled_AUC = metadata_scaled_AUC %>%
+                mutate(pathway = factor(pathway, levels=unique(topreg))) %>%
+                mutate(annot_leiden = factor(annot_leiden, levels=annot_order))
+```
+
+
+```{r}
+plt_UMAP_SCENIC_vertical = ggplot(metadata_scaled_AUC, aes(x=annot_leiden, y=pathway, fill=norm_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            # scale_fill_viridis() +
+                            scale_fill_gradient2(low = "magenta", mid = "black", high = "yellow") +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0),
+                                             guide = guide_axis(angle=45)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC z-score mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r, fig.asp=2}
+plt_UMAP_SCENIC_vertical
+```
+
+```{r}
+plt_UMAP_SCENIC_horizontal = ggplot(metadata_scaled_AUC, aes(x=pathway, y=annot_leiden, fill=norm_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            # scale_fill_viridis() +
+                            scale_fill_gradient2(low = "magenta", mid = "black", high = "yellow") +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0),
+                                             guide = guide_axis(angle=90)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC z-score mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r, fig.asp=2}
+plt_UMAP_SCENIC_horizontal
+```
+
+
+
+# Pathways
+
+## Pathway KEGG
+
+```{r}
+tbl_AUC = read_csv(paste0("data/AUC_pathways/AUC_pathways_KEGG_", fileID, ".csv.gz"))
+
+
+library(reshape2)
+
+tbl_AUC_long = tbl_AUC %>%
+                      melt(id.vars = c("cellID"),
+                          variable.name = "pathway",
+                          value.name= "AUC_score") %>%
+                      as_tibble()
+
+metadata_AUC = left_join(tbl_AUC_long, metadata %>% select(cellID, annot_leiden, UMAP_dim1, UMAP_dim2), by="cellID")
+metadata_AUC_KEGG = metadata_AUC
+```
+
+
+## Pathway panther
+
+```{r}
+tbl_AUC = read_csv(paste0("data/AUC_pathways/AUC_pathways_panther_", fileID, ".csv.gz"))
+
+
+library(reshape2)
+
+tbl_AUC_long = tbl_AUC %>%
+                      melt(id.vars = c("cellID"),
+                          variable.name = "pathway",
+                          value.name= "AUC_score") %>%
+                      as_tibble()
+
+metadata_AUC = left_join(tbl_AUC_long, metadata %>% select(cellID, annot_leiden, UMAP_dim1, UMAP_dim2), by="cellID")
+
+metadata_AUC_panther = metadata_AUC
+```
+
+
+## Manual order
+
+```{r}
+metadata_AUC = bind_rows(metadata_AUC_KEGG, metadata_AUC_panther)
+
+
+pathways_selected = c("mmu04110_Cell_cycle",
+                      "mmu04390_Hippo_signaling_pathway",
+                      "P05918_p38_MAPK_pathway",
+                      "mmu04151_PI3K-Akt_signaling_pathway",
+                      "mmu04310_Wnt_signaling_pathway",
+                      "mmu04330_Notch_signaling_pathway",
+                      "P00018_EGF_receptor_signaling_pathway",
+                      "P00021_FGF_signaling_pathway",
+                      "mmu04514_Cell_adhesion_molecules",
+                      "mmu04080_Neuroactive_ligand-receptor_interaction",
+                      "mmu04014_Ras_signaling_pathway",
+                      "mmu04010_MAPK_signaling_pathway",
+                      "P00056_VEGF_signaling_pathway",
+                      "P00047_PDGF_signaling_pathway")
+
+tbl_pathway_labels = read_csv("data/AUC_pathways/pathway_labels.csv")
+
+tbl_pathway_labels_ordered = left_join(tibble(pathwayID = pathways_selected), tbl_pathway_labels, by="pathwayID")
+
+
+
+metadata_scaled_AUC = metadata_AUC %>%
+                  filter(pathway %in% pathways_selected) %>%
+                  group_by(pathway, annot_leiden) %>%
+                  summarise(mean_AUC_score = mean(AUC_score)) %>%
+                  group_by(pathway) %>%
+                  mutate(norm_0_1_mean_AUC_score = (mean_AUC_score - min(mean_AUC_score))/(max(mean_AUC_score) - min(mean_AUC_score))) %>%
+                  mutate(pathway = factor(pathway, levels=pathways_selected)) %>%
+                  mutate(annot_leiden = factor(annot_leiden, levels=annot_order)) %>%
+                  mutate(pathwayID = pathway) %>%
+                  left_join(tbl_pathway_labels, by="pathwayID") %>%
+                  mutate(pathway_label = factor(pathway_label, levels = tbl_pathway_labels_ordered$pathway_label))
+```
+
+
+
+```{r}
+plt_heatmap_AUC_pathway_vertical = ggplot(metadata_scaled_AUC, aes(x=annot_leiden, y=pathway_label, fill=norm_0_1_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            scale_fill_distiller(palette = 'RdBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0),
+                                             guide = guide_axis(angle=45)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC scaled mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r}
+plt_heatmap_AUC_pathway_vertical
+```
+
+
+```{r}
+plt_heatmap_AUC_pathway_horizontal = ggplot(metadata_scaled_AUC, aes(x=pathway_label, y=annot_leiden, fill=norm_0_1_mean_AUC_score)) +
+                            geom_tile() +
+                            scale_colour_viridis() +
+                            scale_fill_distiller(palette = 'RdBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                            theme_publication +
+                            scale_x_discrete(expand = c(0,0),
+                                             guide = guide_axis(angle=45)) +
+                            scale_y_discrete(expand = c(0,0)) +
+                            labs(x=NULL, y=NULL) +
+                            labs(fill="AUC scaled mean") +
+                            guides(fill = guide_colorbar(barwidth = 0.3,
+                                                         barheight = 2))
+```
+
+```{r}
+plt_heatmap_AUC_pathway_horizontal
+```
+
+
+# Export figures
+
+```{r}
+ggsave("figures/figure_OPCs/UMAP_annot_OPCs.pdf", plot=plt_UMAP_annot_OPCs, height=5, width=8.15, units="cm")
+ggsave("figures/figure_OPCs/UMAP_timepoints_OPCs.pdf", plot=plt_UMAP_day, height=5, width=9.15, units="cm")
+# ggsave("figures/figure_OPCs/UMAP_velocyto_annot_OPCs.pdf", plot=plt_velocyto, height=5, width=9.15, units="cm")
+
+ggsave("figures/figure_OPCs/heatmap_markers_manual_OPCs.pdf", plot=plt_cluster_marker_expr_OPCs, height=3.5, width=8, units="cm")
+
+ggsave("figures/figure_OPCs/dotplot_markers_manual_OPCs.pdf", plot=plt_marker_dotplot_OPCs, height=3.5, width=8, units="cm")
+
+
+ggsave("figures/figure_OPCs/heatmap_DE_markers_top_10_annot_OPCs_horizontal.pdf", plot = plt_DE_marker_annot_horizontal, height=3.5, width=18.3, units="cm")
+ggsave("figures/figure_OPCs/heatmap_DE_markers_top_10_annot_OPCs_vertical.pdf", plot = plt_DE_marker_annot_vertical, height=15.3, width=6, units="cm")
+
+ggsave("figures/figure_OPCs/dotplot_DE_markers_top_10_annot_OPCs_horizontal.pdf", plot = plt_DE_marker_dotplot_OPCs, height=4, width=18.3, units="cm")
+
+
+ggsave("figures/figure_OPCs/heatmap_SCENIC_annot_OPCs_vertical.pdf", plot = plt_UMAP_SCENIC_vertical, height=11, width=6, units="cm")
+
+ggsave("figures/figure_OPCs/heatmap_SCENIC_annot_OPCs_horizontal.pdf", plot = plt_UMAP_SCENIC_horizontal, height=4, width=18.3, units="cm")
+
+
+panel_top = plt_UMAP_annot_OPCs +  labs(tag = '') + plt_UMAP_day + labs(tag='')
+
+ggsave("figures/figure_OPCs/panel_UMAP_OPCs.pdf", plot=panel_top, height=6.5, width=18.3, units="cm")
+
+
+ggsave("figures/figure_OPCs/heatmap_AUC_pathways_annot_OPCs_vertical.pdf", plot = plt_heatmap_AUC_pathway_vertical, height=9, width=8, units="cm")
+
+ggsave("figures/figure_OPCs/heatmap_AUC_pathways_annot_OPCs_horizontal.pdf", plot = plt_heatmap_AUC_pathway_horizontal, height=3.5, width=9, units="cm")
+```

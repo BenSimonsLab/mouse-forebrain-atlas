@@ -1,0 +1,356 @@
+---
+title: "P0 - Neuronal & glial subset"
+author: "Daniel J. Kunz"
+output:
+  workflowr::wflow_html:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    highlight: zenburn
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+
+```{r setup, message=FALSE, warning=TRUE}
+library(ggplot2)
+library(viridis)
+library(patchwork)
+
+library(readr)
+library(dplyr)
+library(tibble)
+```
+
+
+
+```{r, message=FALSE, warning=TRUE}
+source("code/core_settings.R")
+source("code/core_functions.R")
+```
+
+
+```{r}
+# set parameters
+fileID = "normal_P0_subset_neuronal_glial"
+leiden_res = 'leiden_0_1'
+leiden_res_annot = 'leiden_0_1'
+
+adata_path = paste0('data/forebrain_', fileID, '.h5ad')
+```
+
+```{r}
+#repl_python()
+py_run_string("import numpy as np")
+py_run_string("import anndata as ad")
+
+py_run_string("adata = ad.read_h5ad(r.adata_path)")
+```
+
+
+```{r, message=FALSE, warning=TRUE}
+metadata_scanpy = as_tibble(py$adata$obs, rownames="cellID") %>%
+                    rename(mt_frac = percent_mito) %>%
+                    mutate(UMAP_dim1 = py$adata$obsm[['X_umap']][,1],
+                           UMAP_dim2 = py$adata$obsm[['X_umap']][,2])
+
+metadata_experiment = read_tsv("data/metadata_experiment.tsv")
+results_cyclone = read_csv("data/cyclone/cyclone_merged.csv.gz", col_types="ccddd") %>%
+                    mutate(sampleID = sapply(cellID, function(cell) strsplit(cell, split="-")[[1]][3])) %>%
+                    left_join(metadata_experiment, by="sampleID") %>%
+                    mutate(cellID = gsub("-1", "", cellID)) %>%
+                    select(cellID, cyclone, cyclone_G1, cyclone_S, cyclone_G2M)
+
+results_logreg = read_csv(paste0("data/logreg/logreg_Zeisel_2018_normal.csv.gz"))
+
+
+
+# filter QC
+metadata = left_join(metadata_scanpy, results_cyclone, by="cellID") %>%
+              mutate(cyclone = factor(cyclone, levels=c("G1", "S", "G2M"))) %>%
+              mutate(timepoint = factor(timepoint, levels=unique(timepoint)[order(unique(postnatal_day))])) %>%
+              left_join(results_logreg, by="cellID") %>%
+              mutate(leiden = get(leiden_res))  %>%
+              mutate(gate_gfp = gsub("SOX2_-ve", "GFP-", gate)) %>%
+              mutate(gate_gfp = gsub("SOX2_\\+ve", "GFP+ [SOX2]", gate_gfp))
+```
+
+
+# Samples
+
+```{r, fig.asp=0.3, message=FALSE, warning=TRUE}
+sample_counts = metadata %>%
+                  group_by(timepoint, gate_gfp) %>%
+                  summarise(n_cells= n())
+
+plt_bar_samples = ggplot(sample_counts, aes(x=timepoint, y=n_cells, fill=gate_gfp)) +
+                            geom_bar(stat="identity", position="dodge") +
+                            scale_fill_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                            theme_publication +
+                            labs(x="Timepoint", y="Number of Cells") +
+                            labs(fill="FACS Gate") +
+                            guides(colour = guide_legend(override.aes = list(size=2)))
+
+plt_bar_samples
+```
+
+
+# Cell Type Mapping
+
+Map cell annotation from Zeisel 2018 using logistic regression.
+
+```{r, fig.asp=0.3}
+plt_UMAP_logreg = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=prediction_TaxonomyRank1)) +
+                            geom_point(size=0.2, alpha=0.6, shape=16) +
+                            # scale_colour_viridis() +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Logreg") +
+                            guides(colour = guide_legend(override.aes = list(size=2)))
+
+
+plt_UMAP_logreg_prob = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=probability_TaxonomyRank1)) +
+                            geom_point(size=0.2, alpha=0.6, shape=16) +
+                            scale_colour_viridis() +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Logreg Probability")
+
+plt_UMAP_logreg | plt_UMAP_logreg_prob
+```
+
+
+
+# Sox2 Gate
+
+```{r, fig.asp=0.3}
+# randomise order for plot
+plt_UMAP_gate = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, colour=gate_gfp)) +
+                            geom_point(size=0.5, alpha=0.6, shape=16) +
+                            # scale_color_manual(values=c("SOX2_-ve"="#1F77B4", "SOX2_+ve"="#FF7F0E", "tdTomato_-ve"="black", "tdTomato_+ve"="red")) +
+                            scale_colour_manual(values=c("GFP-"="#CCCCCC", "GFP+ [SOX2]"="#65A83E")) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="FACS gate") +
+                            guides(colour = guide_legend(override.aes = list(size=2)))
+
+
+panel_Sox2 = plt_UMAP_gate | plot_UMAP_expr("Sox2")
+
+panel_Sox2
+```
+
+# Cell Cycle
+
+```{r, fig.asp=0.3}
+panel_ccgenes = plot_UMAP_expr("Mki67") | plot_UMAP_expr("Top2a")
+
+panel_ccgenes
+```
+
+
+```{r}
+expr_cellcycle = get_adata_raw_expr(c("Mki67", "Top2a"))
+
+
+metadata_cc = metadata %>%
+            left_join(expr_cellcycle, by="cellID") %>%
+            mutate(cell_cycle = if_else(expr_Mki67 > 1 | expr_Top2a > 1, as.vector(cyclone), "G0")) %>%
+            mutate(cell_cycle = factor(cell_cycle, levels=c("G0", "G1", "S", "G2M"))) %>%
+            arrange(cell_cycle) %>%
+            slice(c(1:sum(cell_cycle == "G0"), sample((sum(cell_cycle == "G0") + 1):n())))
+```
+
+```{r}
+plt_panel_UMAP_cellcycle = ggplot(metadata_cc, aes(x=UMAP_dim1, y=UMAP_dim2, colour=cell_cycle)) +
+                            # geom_point_rast(size=0.1, alpha=0.8, shape=16, raster.dpi=600) +
+                            geom_point(size=0.1, alpha=0.8, shape=16) +
+                            scale_color_manual(values=c("G0"="#D0DFE6", "G1"="#19476F", "S"="#E47E00", "G2M"="#90353B")) +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(colour="Cell cycle") +
+                            # labs(title=NULL) +
+                            guides(colour = guide_legend(override.aes = list(size=2),
+                                                         keyheight=0.3,
+                                                         default.unit="cm"))
+```
+
+```{r}
+plt_panel_UMAP_cellcycle
+```
+
+# Cell Stats
+
+```{r, fig.asp=0.6}
+plt_UMAP_n_counts = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, z=n_counts)) +
+                            stat_summary_hex(bins=100) +
+                            scale_colour_viridis() +
+                            scale_fill_viridis() +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(fill="Counts")
+
+plt_UMAP_n_genes = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, z=n_genes)) +
+                            stat_summary_hex(bins=100) +
+                            scale_colour_viridis() +
+                            scale_fill_viridis() +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(fill="Genes")
+
+plt_UMAP_mt = ggplot(slice(metadata, sample(1:n())), aes(x=UMAP_dim1, y=UMAP_dim2, z=mt_frac)) +
+                            stat_summary_hex(bins=100) +
+                            scale_colour_viridis() +
+                            scale_fill_viridis() +
+                            theme_publication +
+                            labs(x="UMAP 1", y="UMAP 2") +
+                            theme(axis.text.x=element_blank(),
+                                  axis.ticks.x=element_blank(),
+                                  axis.text.y=element_blank(),
+                                  axis.ticks.y=element_blank()) +
+                            labs(fill="MT Content")
+
+
+plt_UMAP_n_counts + plt_UMAP_n_genes + plt_UMAP_mt + plot_layout(ncol=2)
+```
+
+
+# Annotation
+
+```{r}
+plot_UMAP_leiden("annot_leiden")
+```
+
+
+# Leiden Clustering
+
+```{r}
+plot_UMAP_leiden("leiden_0_05")
+plot_UMAP_leiden("leiden_0_1")
+plot_UMAP_leiden("leiden_0_2")
+plot_UMAP_leiden("leiden_0_3")
+plot_UMAP_leiden("leiden_0_4")
+```
+
+
+# Marker Genes
+
+```{r, message=FALSE, warning=TRUE}
+marker_genes = c("Sox2", "Nes", "Hes1", "Prom1", "Dlx1", "Dlx2", "Dlx5", "Sp9",
+                 "Dcx", "Nhlh2", "Ebf2", "Lhx9", "Tcf7l2", "Irx1", "Irx2", "Irx3",
+                 "Tbr1", "Emx1", "Reln", "Gad2", "Gata2", "Gata3", "Pitx2", "Slc17a6",
+                 "Meis2")
+
+marker_list = marker_genes
+
+tbl_expr = get_adata_raw_expr(marker_list)
+
+
+tbl_DE_expr = metadata %>%
+               select(cellID, !!(leiden_res_annot)) %>%
+               mutate(clusterID = get(leiden_res_annot)) %>%
+               left_join(tbl_expr, by="cellID") %>%
+               tidyr::pivot_longer(starts_with("expr_"), names_to="geneID", values_to="expr") %>%
+               mutate(geneID = gsub("expr_", "", geneID)) %>%
+               group_by(geneID, clusterID) %>%
+               summarise(frac_expressed = sum(expr > 0)/length(expr),
+                         expr_average = mean(expr)) %>%
+               ungroup() %>%
+               group_by(geneID) %>%
+               mutate(expr_scaled = expr_average/max(expr_average)) %>%
+               ungroup() %>%
+               mutate(geneID = factor(geneID, levels = marker_list)) #%>%
+               # mutate(clusterID = factor(clusterID, levels=annot_order))
+
+# expr_Gene
+plt_DE_dotplot = ggplot(tbl_DE_expr, aes(x=geneID, y=clusterID, size=frac_expressed, colour=expr_scaled)) +
+                           geom_point(stroke=0) +
+                           scale_size_continuous(range = c(0, 2.0), limits=c(0, 1), breaks = c(0, 0.5, 1.0)) +
+                           theme_publication +
+                           scale_colour_distiller(palette = 'RdYlBu', breaks=c(0, 0.5, 1), limits=c(0,1)) +
+                           labs(x=NULL, y=NULL) +
+                           labs(colour = "Expr (scaled)") +
+                           guides(colour = guide_colorbar(barwidth = 0.3,
+                                                        barheight = 1.5)) +
+                           theme(axis.text.x = element_text(angle = 90, vjust=0.5, hjust=1)) +
+                           labs(size = "Fraction expressing") +
+                           theme(legend.spacing.y = unit(0.05, 'cm')) +
+                           theme(legend.key.height = unit(0.2, "cm"))
+```
+
+```{r, fig.asp=0.6}
+plt_DE_dotplot
+```
+
+
+```{r, fig.asp=0.3}
+plot_UMAP_expr("Sox2") + plot_UMAP_expr("Nes")
+plot_UMAP_expr("Hes1") + plot_UMAP_expr("Prom1")
+plot_UMAP_expr("Dlx1") + plot_UMAP_expr("Dlx2")
+plot_UMAP_expr("Dlx5") + plot_UMAP_expr("Sp9")
+plot_UMAP_expr("Dcx") + plot_UMAP_expr("Nhlh2")
+plot_UMAP_expr("Ebf2") + plot_UMAP_expr("Lhx9")
+plot_UMAP_expr("Tcf7l2") + plot_UMAP_expr("Irx1")
+plot_UMAP_expr("Irx2") + plot_UMAP_expr("Irx3")
+plot_UMAP_expr("Tbr1") + plot_UMAP_expr("Emx1")
+plot_UMAP_expr("Reln") + plot_UMAP_expr("Gad2")
+plot_UMAP_expr("Gata2") + plot_UMAP_expr("Gata3")
+plot_UMAP_expr("Pitx2") + plot_UMAP_expr("Slc17a6")
+plot_UMAP_expr("Meis2") + plot_UMAP_expr("Top2a")
+```
+
+
+# Marker Genes
+
+```{r, fig.asp=0.3}
+plot_UMAP_expr("Sox2") + plot_UMAP_expr("Nes")
+plot_UMAP_expr("Hes1") + plot_UMAP_expr("Prom1")
+plot_UMAP_expr("Aldoc") + plot_UMAP_expr("Slc1a3")
+plot_UMAP_expr("Vcam1") + plot_UMAP_expr("Ntsr2")
+plot_UMAP_expr("Aqp4") + plot_UMAP_expr("Gja1")
+plot_UMAP_expr("Nhlh2") + plot_UMAP_expr("Nhlh1")
+plot_UMAP_expr("Ebf2") + plot_UMAP_expr("Ebf1")
+plot_UMAP_expr("Reln") + plot_UMAP_expr("Mki67")
+plot_UMAP_expr("Dcx") + plot_UMAP_expr("Dlx1")
+plot_UMAP_expr("Dlx2") + plot_UMAP_expr("Dlx5")
+plot_UMAP_expr("Sp9") + plot_UMAP_expr("Neurod2")
+plot_UMAP_expr("Tbr1") + plot_UMAP_expr("Olig2")
+plot_UMAP_expr("Olig1") + plot_UMAP_expr("Pdgfra")
+plot_UMAP_expr("Fyn") + plot_UMAP_expr("Plp1")
+plot_UMAP_expr("Mbp") + plot_UMAP_expr("Foxj1")
+plot_UMAP_expr("Gad2") + plot_UMAP_expr("Gata2")
+plot_UMAP_expr("Gata3") + plot_UMAP_expr("Rarb")
+plot_UMAP_expr("Col1a1") + plot_UMAP_expr("Col1a2")
+plot_UMAP_expr("Csf1r") + plot_UMAP_expr("P2ry12")
+plot_UMAP_expr("Tmem119") + plot_UMAP_expr("Cd14")
+plot_UMAP_expr("Mrc1") + plot_UMAP_expr("Lyve1")
+plot_UMAP_expr("Cd3e") + plot_UMAP_expr("Trbc1")
+plot_UMAP_expr("Alas2") + plot_UMAP_expr("Hbb-bt")
+plot_UMAP_expr("Ttr") + plot_UMAP_expr("Flt1")
+plot_UMAP_expr("S100a8") + plot_UMAP_expr("S100a9")
+```
