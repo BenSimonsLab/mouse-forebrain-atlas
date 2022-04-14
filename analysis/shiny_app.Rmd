@@ -12,7 +12,8 @@ editor_options:
 ---
 
 
-This interactive website accompanies the manuscript A brain precursor atlas identifies embryonic cells at the root of cerebral tumours. To report any issues please contact the creator of the website Daniel Kunz at djk44 [at] cam.ac.uk, or Benjamin Simons at bds10 [at] cam.ac.uk.
+This interactive website accompanies the manuscript A brain precursor atlas identifies embryonic cells at the root of cerebral tumours. To report any issues please contact the creator of the website Daniel Kunz at djk44 [at] cam.ac.uk, or Benjamin Simons at bds10 [at] cam.ac.uk. For questions about the experiments please contact Akram Hamed (a.hamed [at] mail.utoronto.ca) or Peter Dirks (peter.dirks [at] sickkids.ca).
+
 It might take some time to initally generate all plots for your session.
 
 Using this [link](https://shiny-server.gurdon.cam.ac.uk/djk44/brain-development_app/) you can open the app in an external window as well.
