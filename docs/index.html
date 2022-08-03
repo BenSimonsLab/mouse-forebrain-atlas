@@ -14,7 +14,7 @@
 
 <title>Home</title>
 
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -33,7 +33,7 @@
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 
-<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
 <style type="text/css">
 div.section {
@@ -68,6 +68,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -88,6 +89,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -240,7 +244,7 @@ $(document).ready(function () {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -253,7 +257,7 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Analysis
      
     <span class="caret"></span>
@@ -266,10 +270,10 @@ $(document).ready(function () {
       <a href="brain-dev-overview.html">Overview</a>
     </li>
     <li class="dropdown-submenu">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Timepoints</a>
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Timepoints</a>
       <ul class="dropdown-menu" role="menu">
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">E12.5</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">E12.5</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-E12_5.html">E12.5 [full]</a>
@@ -280,7 +284,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">E14.5</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">E14.5</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-E14_5.html">E14.5 [full]</a>
@@ -291,7 +295,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">E16.5</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">E16.5</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-E16_5.html">E16.5 [full]</a>
@@ -302,7 +306,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P0</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P0</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P0.html">P0 [full]</a>
@@ -313,7 +317,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P2</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P2</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P2.html">P2 [full]</a>
@@ -324,7 +328,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P7</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P7</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P7.html">P7 [full]</a>
@@ -335,7 +339,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P13</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P13</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P13.html">P13 [full]</a>
@@ -346,7 +350,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P19</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P19</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P19.html">P19 [full]</a>
@@ -357,7 +361,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P39</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P39</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P39.html">P39 [full]</a>
@@ -368,7 +372,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P111</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P111</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P111.html">P111 [full]</a>
@@ -379,7 +383,7 @@ $(document).ready(function () {
           </ul>
         </li>
         <li class="dropdown-submenu">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">P365</a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">P365</a>
           <ul class="dropdown-menu" role="menu">
             <li>
               <a href="brain-dev-P365.html">P365 [full]</a>
@@ -392,7 +396,7 @@ $(document).ready(function () {
       </ul>
     </li>
     <li class="dropdown-submenu">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Subsets</a>
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Subsets</a>
       <ul class="dropdown-menu" role="menu">
         <li>
           <a href="brain-dev-embryonic_RG.html">Embryonic RG</a>
@@ -409,7 +413,7 @@ $(document).ready(function () {
       </ul>
     </li>
     <li class="dropdown-submenu">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">External</a>
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">External</a>
       <ul class="dropdown-menu" role="menu">
         <li>
           <a href="external_GBM_Richards_2021.html">GBM - Richards 2021</a>
@@ -425,7 +429,7 @@ $(document).ready(function () {
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Figures
      
     <span class="caret"></span>
@@ -480,7 +484,7 @@ $(document).ready(function () {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -489,7 +493,7 @@ $(document).ready(function () {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> </a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -498,17 +502,17 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-03-23
+<strong>Last updated:</strong> 2022-08-03
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 1 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 1
 </p>
 <p>
 <strong>Knit directory:</strong> <code>forebrain-atlas_workflowr/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
 </p>
 <p>
-This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -517,34 +521,35 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguncommittedchanges"> <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> <strong>R Markdown file:</strong> uncommitted changes </a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguncommittedchanges" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>The R Markdown file has unstaged changes. To know which version of the R Markdown file created these results, you’ll want to first commit it to the Git repo. If you’re still working on the analysis, you can ignore this warning. When you’re finished, you can run <code>wflow_publish</code> to commit the R Markdown file and build the HTML.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongda0cf96"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> da0cf96 </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrong2bc9f3f"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> 2bc9f3f </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongda0cf96" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrong2bc9f3f" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version da0cf96. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version 2bc9f3f. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 </p>
 <pre><code>
 Untracked files:
+    Untracked:  analysis/figure_ependymal_cells.Rmd
     Untracked:  code/core_functions.R
     Untracked:  code/core_functions_supp.R
     Untracked:  code/core_settings.R
@@ -553,8 +558,10 @@ Untracked files:
     Untracked:  data/Richards_2021/
     Untracked:  data/URD/
     Untracked:  data/annot/
+    Untracked:  data/cmat_normal.csv.gz
     Untracked:  data/cyclone/
     Untracked:  data/external_metadata/
+    Untracked:  data/forebrain_atlas.h5ad
     Untracked:  data/forebrain_normal.h5ad
     Untracked:  data/forebrain_normal_E12_5.h5ad
     Untracked:  data/forebrain_normal_E12_5_subset_neuronal_glial.h5ad
@@ -585,6 +592,7 @@ Untracked files:
     Untracked:  data/forebrain_normal_merged_subset_neuronal_glial_cleaned_harmony.h5ad
     Untracked:  data/forebrain_normal_merged_subset_neuronal_glial_subset_RG_OPC_NSC_lineage.h5ad
     Untracked:  data/forebrain_normal_merged_subset_neuronal_glial_subset_RG_OPC_NSC_lineage_cleaned.h5ad
+    Untracked:  data/forebrain_normal_raw.h5ad
     Untracked:  data/forebrain_normal_subset_OPCs.h5ad
     Untracked:  data/forebrain_normal_subset_RG.h5ad
     Untracked:  data/forebrain_normal_subset_aNSCs.h5ad
@@ -617,12 +625,15 @@ Untracked files:
     Untracked:  data/metadata_QC_normal.csv.gz
     Untracked:  data/metadata_QC_normal_pass.csv.gz
     Untracked:  data/metadata_experiment.tsv
+    Untracked:  data/metadata_forebrain_atlas.csv.gz
+    Untracked:  data/metadata_overview.csv.gz
     Untracked:  data/monocle_3/
     Untracked:  data/pagoda/
     Untracked:  data/scenic/
     Untracked:  data/scrublet_scores/
     Untracked:  data/supplementary_data/
     Untracked:  figures/
+    Untracked:  figures_OLD/
     Untracked:  output/normal/
     Untracked:  output/normal_merged_RG_NSC_lineage/
     Untracked:  output/normal_merged_RG_aNSC_lineage/
@@ -636,7 +647,18 @@ Untracked files:
 
 Unstaged changes:
     Deleted:    analysis/about.Rmd
+    Modified:   analysis/figure1.Rmd
+    Modified:   analysis/figure_NBs.Rmd
+    Modified:   analysis/figure_OPCs.Rmd
+    Modified:   analysis/figure_QC.Rmd
+    Modified:   analysis/figure_RG_NSC_lineage.Rmd
+    Modified:   analysis/figure_embryonic_RG.Rmd
+    Modified:   analysis/figure_neuronal_glial.Rmd
+    Modified:   analysis/figure_neuronal_glial_lineage_tree.Rmd
+    Modified:   analysis/figure_overview.Rmd
+    Modified:   analysis/index.Rmd
     Deleted:    analysis/license.Rmd
+    Modified:   analysis/shiny_app.Rmd
 
 </code></pre>
 <p>
@@ -656,13 +678,13 @@ There are no past versions. Publish this analysis with <code>wflow_publish()</co
 </div>
 </div>
 </div>
-<p>Website accompanying the manuscript <em>A brain precursor atlas identifies embryonic cells at the root of cerebral tumours</em>.</p>
-<p>The code used for the core processing of the developmental data can be found on <a href="https://github.com/BenSimonsLab/Hamed_2020">github</a>.</p>
+<p>Website accompanying the publication <a href="https://doi.org/10.1038/s41467-022-31408-y"><em>A brain precursor atlas reveals the acquisition of developmental-like states in adult cerebral tumours</em></a>.</p>
+<p>The code used for the core processing of the developmental data can be found on <a href="https://github.com/BenSimonsLab/Hamed_Nat-Commun_2022">github</a>.</p>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
 TeX fonts only; see
-http://docs.mathjax.org/en/latest/configuration.html.  This will make
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
 the presentation more consistent at the cost of the webpage sometimes
 taking slightly longer to load. Note that this only works because the
 footer is added to webpages before the MathJax javascript. -->

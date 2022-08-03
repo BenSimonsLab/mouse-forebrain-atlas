@@ -9,6 +9,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-Website accompanying the manuscript *A brain precursor atlas identifies embryonic cells at the root of cerebral tumours*.
+Website accompanying the publication [*A brain precursor atlas reveals the acquisition of developmental-like states in adult cerebral tumours*](https://doi.org/10.1038/s41467-022-31408-y).
 
-The code used for the core processing of the developmental data can be found on [github](https://github.com/BenSimonsLab/Hamed_2020).
+The code used for the core processing of the developmental data can be found on [github](https://github.com/BenSimonsLab/Hamed_Nat-Commun_2022).
