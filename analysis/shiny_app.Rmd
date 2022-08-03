@@ -12,7 +12,7 @@ editor_options:
 ---
 
 
-This interactive website accompanies the manuscript [*A brain precursor atlas reveals the acquisition of developmental-like states in adult cerebral tumours*](https://doi.org/10.1038/s41467-022-31408-y). To report any issues please contact the creator of the website Daniel Kunz (djk44@cam.ac.uk), or Benjamin Simons (bds10@cam.ac.uk). For questions about the experiments please contact Akram Hamed (a.hamed@mail.utoronto.ca) or Peter Dirks (peter.dirks@sickkids.ca).
+This interactive website accompanies the manuscript [*A brain precursor atlas reveals the acquisition of developmental-like states in adult cerebral tumours*](https://doi.org/10.1038/s41467-022-31408-y). To report any issues please contact the creator of the website Daniel Kunz (djk44@cam.ac.uk), or Benjamin Simons (bds10@cam.ac.uk). For questions about the experiments please contact Peter Dirks (peter.dirks@sickkids.ca).
 
 It might take some time to initially generate all plots for your session.
 
